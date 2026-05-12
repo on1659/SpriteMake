@@ -1,0 +1,634 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bridge Cross Sprite Preview</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #070913;
+      --panel: #11182b;
+      --panel-2: #17223a;
+      --line: #2c3d63;
+      --text: #eef6ff;
+      --muted: #91a4c6;
+      --cyan: #42edff;
+      --gold: #ffd86b;
+      --pink: #ff5cc8;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Segoe UI, Pretendard, sans-serif;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--line);
+      background: #0b1020;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: 360px minmax(0, 1fr);
+      min-height: calc(100vh - 57px);
+    }
+
+    aside {
+      border-right: 1px solid var(--line);
+      background: var(--panel);
+      padding: 14px;
+      overflow: auto;
+    }
+
+    section {
+      padding: 14px;
+      overflow: auto;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      margin-bottom: 12px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    select,
+    input,
+    button {
+      width: 100%;
+      min-height: 36px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #0b1020;
+      color: var(--text);
+      font: inherit;
+      padding: 7px 9px;
+    }
+
+    button {
+      cursor: pointer;
+      background: var(--panel-2);
+      font-weight: 800;
+    }
+
+    button.active {
+      border-color: var(--cyan);
+      color: var(--cyan);
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .check-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 36px;
+      margin-bottom: 12px;
+      padding: 8px 9px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #0b1020;
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .check-row input {
+      width: 16px;
+      min-height: 16px;
+      accent-color: var(--cyan);
+    }
+
+    .hint,
+    .meta {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .meta {
+      margin-top: 12px;
+      padding: 10px;
+      background: #0b1020;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      white-space: pre-wrap;
+    }
+
+    .stage-wrap {
+      display: grid;
+      grid-template-columns: minmax(320px, 0.8fr) minmax(420px, 1.2fr);
+      gap: 14px;
+      align-items: start;
+    }
+
+    .canvas-panel {
+      background: #0b1020;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      min-width: 0;
+    }
+
+    .panel-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      image-rendering: pixelated;
+      background:
+        linear-gradient(45deg, #151a2a 25%, transparent 25%),
+        linear-gradient(-45deg, #151a2a 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #151a2a 75%),
+        linear-gradient(-45deg, transparent 75%, #151a2a 75%);
+      background-size: 20px 20px;
+      background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+      border-radius: 6px;
+    }
+
+    #stageCanvas {
+      aspect-ratio: 1 / 1;
+    }
+
+    #sheetCanvas {
+      max-height: 72vh;
+      object-fit: contain;
+    }
+
+    .badge {
+      color: var(--cyan);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    @media (max-width: 980px) {
+      main,
+      .stage-wrap {
+        grid-template-columns: 1fr;
+      }
+      aside {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Bridge Cross Sprite Preview</h1>
+    <span class="badge">standalone file mode</span>
+  </header>
+  <main>
+    <aside>
+      <label>
+        Sheet
+        <select id="sheetSelect"></select>
+      </label>
+      <label id="paletteWrap" hidden>
+        Palette
+        <select id="paletteSelect"></select>
+      </label>
+      <label>
+        Animation
+        <select id="animSelect"></select>
+      </label>
+      <label class="check-row">
+        <input id="outlineToggle" type="checkbox" checked>
+        My character outline
+      </label>
+      <div class="row">
+        <button id="playBtn" class="active">Play</button>
+        <button id="frameBtn">Next Frame</button>
+      </div>
+      <label>
+        FPS
+        <input id="fpsInput" type="number" min="1" max="30" value="8">
+      </label>
+      <label>
+        Scale %
+        <input id="scaleInput" type="number" min="20" max="300" value="100">
+      </label>
+      <label>
+        Optional PNG Override
+        <input id="fileInput" type="file" accept="image/png,image/*">
+      </label>
+      <div class="hint">
+        이 파일은 서버 없이 더블클릭으로 열 수 있습니다. 기본 이미지는 HTML 기준 상대경로로 로드하고, 막히면 PNG Override로 직접 선택하면 됩니다.
+      </div>
+      <div class="meta" id="meta"></div>
+    </aside>
+    <section>
+      <div class="stage-wrap">
+        <div class="canvas-panel">
+          <div class="panel-title">
+            <span>Animation Stage</span>
+            <span id="frameLabel"></span>
+          </div>
+          <canvas id="stageCanvas" width="520" height="520"></canvas>
+        </div>
+        <div class="canvas-panel">
+          <div class="panel-title">
+            <span>Full Sheet Grid</span>
+            <span id="sizeLabel"></span>
+          </div>
+          <canvas id="sheetCanvas" width="900" height="720"></canvas>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const MANIFEST = {
+      sheets: {
+        playersMyOutline: {
+          label: "Bridge Cross My Character Outline V1",
+          image: "../final/players-my-outline-v1.png",
+          grid: { columns: 4, rows: 7 },
+          anchor: { x: 0.5, y: 0.88, mode: "normalized" },
+          baselineY: 165,
+          defaultScale: 0.58,
+          animations: {
+            idle: { row: 0, frames: [0, 1, 2, 3], fps: 5, loop: true },
+            walk: { row: 6, frames: [0, 1, 2, 3], fps: 5, loop: true },
+            run: { row: 1, frames: [0, 1, 2, 3], fps: 8, loop: true },
+            jump: { row: 2, frames: [0, 1, 2, 3], fps: 7, loop: false },
+            land: { row: 3, frames: [0, 1, 2, 3], fps: 8, loop: false },
+            fall: { row: 4, frames: [0, 1, 2, 3], fps: 7, loop: false },
+            result: { row: 5, frames: [0, 1, 2, 3], fps: 5, loop: true }
+          }
+        },
+        playersOutline: {
+          label: "Bridge Cross Player Outline Overlay V1",
+          image: "../final/players-outline-v1.png",
+          grid: { columns: 4, rows: 7 },
+          anchor: { x: 0.5, y: 0.88, mode: "normalized" },
+          baselineY: 165,
+          defaultScale: 0.58,
+          animations: {
+            idle: { row: 0, frames: [0, 1, 2, 3], fps: 5, loop: true },
+            walk: { row: 6, frames: [0, 1, 2, 3], fps: 5, loop: true },
+            run: { row: 1, frames: [0, 1, 2, 3], fps: 8, loop: true },
+            jump: { row: 2, frames: [0, 1, 2, 3], fps: 7, loop: false },
+            land: { row: 3, frames: [0, 1, 2, 3], fps: 8, loop: false },
+            fall: { row: 4, frames: [0, 1, 2, 3], fps: 7, loop: false },
+            result: { row: 5, frames: [0, 1, 2, 3], fps: 5, loop: true }
+          }
+        },
+        finishLotteryObject: {
+          label: "Bridge Cross Finish Lottery Object V1",
+          image: "../generated/finish-lottery-object-v1.png",
+          grid: { columns: 4, rows: 6 },
+          anchor: { x: 0.5, y: 0.88, mode: "normalized" },
+          baselineY: 165,
+          defaultScale: 0.72,
+          animations: {
+            idle_closed: { row: 0, frames: [0, 1, 2, 3], fps: 5, loop: true },
+            gather_prompt: { row: 1, frames: [0, 1, 2, 3], fps: 7, loop: true },
+            mix_shake: { row: 2, frames: [0, 1, 2, 3], fps: 10, loop: true },
+            draw_lot: { row: 3, frames: [0, 1, 2, 3], fps: 8, loop: false },
+            reveal_lot: { row: 4, frames: [0, 1, 2, 3], fps: 8, loop: false },
+            reset_settle: { row: 5, frames: [0, 1, 2, 3], fps: 6, loop: false }
+          }
+        },
+        currentBluePlayer: {
+          label: "Current Blue Player Sheet",
+          image: "../sprites/players-blue.png",
+          grid: { columns: 4, rows: 7 },
+          anchor: { x: 0.5, y: 0.88, mode: "normalized" },
+          baselineY: 165,
+          defaultScale: 0.58,
+          animations: {
+            idle: { row: 0, frames: [0, 1, 2, 3], fps: 5, loop: true },
+            walk: { row: 6, frames: [0, 1, 2, 3], fps: 5, loop: true },
+            run: { row: 1, frames: [0, 1, 2, 3], fps: 8, loop: true },
+            jump: { row: 2, frames: [0, 1, 2, 3], fps: 7, loop: false },
+            land: { row: 3, frames: [0, 1, 2, 3], fps: 8, loop: false },
+            fall: { row: 4, frames: [0, 1, 2, 3], fps: 7, loop: false },
+            result: { row: 5, frames: [0, 1, 2, 3], fps: 5, loop: true }
+          }
+        }
+      }
+    };
+
+    const els = {
+      sheetSelect: document.getElementById("sheetSelect"),
+      paletteWrap: document.getElementById("paletteWrap"),
+      paletteSelect: document.getElementById("paletteSelect"),
+      animSelect: document.getElementById("animSelect"),
+      playBtn: document.getElementById("playBtn"),
+      frameBtn: document.getElementById("frameBtn"),
+      fpsInput: document.getElementById("fpsInput"),
+      scaleInput: document.getElementById("scaleInput"),
+      fileInput: document.getElementById("fileInput"),
+      outlineToggle: document.getElementById("outlineToggle"),
+      meta: document.getElementById("meta"),
+      frameLabel: document.getElementById("frameLabel"),
+      sizeLabel: document.getElementById("sizeLabel"),
+      stageCanvas: document.getElementById("stageCanvas"),
+      sheetCanvas: document.getElementById("sheetCanvas")
+    };
+
+    const state = {
+      sheetId: "currentBluePlayer",
+      animId: "walk",
+      image: null,
+      outlineImage: null,
+      imageUrl: "",
+      frameIndex: 0,
+      elapsed: 0,
+      playing: true,
+      lastTs: 0
+    };
+
+    const stageCtx = els.stageCanvas.getContext("2d");
+    const sheetCtx = els.sheetCanvas.getContext("2d");
+    stageCtx.imageSmoothingEnabled = false;
+    sheetCtx.imageSmoothingEnabled = false;
+
+    function sheet() {
+      return MANIFEST.sheets[state.sheetId];
+    }
+
+    function anim() {
+      return sheet().animations[state.animId];
+    }
+
+    function isPlayerSheet() {
+      return state.sheetId === "currentBluePlayer";
+    }
+
+    function loadImage(src) {
+      return new Promise((resolve) => {
+        const image = new Image();
+        image.onload = () => resolve(image);
+        image.onerror = () => resolve(null);
+        image.src = src;
+      });
+    }
+
+    async function setImage(src) {
+      state.imageUrl = src;
+      state.image = await loadImage(src);
+      state.frameIndex = 0;
+      draw();
+    }
+
+    async function loadOutlineImage() {
+      state.outlineImage = await loadImage(MANIFEST.sheets.playersMyOutline.image);
+      draw();
+    }
+
+    function populateSheets() {
+      els.sheetSelect.innerHTML = Object.entries(MANIFEST.sheets)
+        .map(([id, s]) => `<option value="${id}">${s.label}</option>`)
+        .join("");
+      els.sheetSelect.value = state.sheetId;
+    }
+
+    function populateAnimations() {
+      const s = sheet();
+      const ids = Object.keys(s.animations);
+      if (!ids.includes(state.animId)) state.animId = ids[0];
+      els.animSelect.innerHTML = ids.map((id) => `<option value="${id}">${id}</option>`).join("");
+      els.animSelect.value = state.animId;
+      els.fpsInput.value = s.animations[state.animId].fps || 8;
+      els.scaleInput.value = Math.round((s.defaultScale || 1) * 100);
+    }
+
+    function cellRect(row, col) {
+      const s = sheet();
+      const cw = Math.floor(state.image.width / s.grid.columns);
+      const ch = Math.floor(state.image.height / s.grid.rows);
+      return { sx: col * cw, sy: row * ch, sw: cw, sh: ch };
+    }
+
+    function anchorPx(s, cw, ch) {
+      const a = s.anchor || { x: 0.5, y: 0.88, mode: "normalized" };
+      if (a.mode === "pixel") return { x: a.x, y: a.y };
+      return { x: a.x * cw, y: a.y * ch };
+    }
+
+    function drawStage() {
+      const canvas = els.stageCanvas;
+      stageCtx.clearRect(0, 0, canvas.width, canvas.height);
+      stageCtx.fillStyle = "#060914";
+      stageCtx.fillRect(0, 0, canvas.width, canvas.height);
+
+      if (!state.image) {
+        stageCtx.fillStyle = "#91a4c6";
+        stageCtx.font = "16px Segoe UI";
+        stageCtx.fillText("Image not loaded. Use PNG Override.", 36, 58);
+        return;
+      }
+
+      const s = sheet();
+      const a = anim();
+      const frame = a.frames[state.frameIndex % a.frames.length];
+      const rect = cellRect(a.row, frame);
+      const scale = Number(els.scaleInput.value || 100) / 100;
+      const w = rect.sw * scale;
+      const h = rect.sh * scale;
+      const anc = anchorPx(s, rect.sw, rect.sh);
+      const baseX = canvas.width / 2;
+      const baseY = canvas.height * 0.68;
+      const dx = Math.round(baseX - anc.x * scale);
+      const dy = Math.round(baseY - anc.y * scale);
+
+      stageCtx.strokeStyle = "rgba(66, 237, 255, 0.35)";
+      stageCtx.lineWidth = 2;
+      stageCtx.beginPath();
+      stageCtx.moveTo(44, baseY);
+      stageCtx.lineTo(canvas.width - 44, baseY);
+      stageCtx.stroke();
+
+      if (isPlayerSheet() && els.outlineToggle.checked && state.outlineImage) {
+        stageCtx.drawImage(state.outlineImage, rect.sx, rect.sy, rect.sw, rect.sh, dx, dy, w, h);
+      }
+      stageCtx.drawImage(state.image, rect.sx, rect.sy, rect.sw, rect.sh, dx, dy, w, h);
+
+      stageCtx.fillStyle = "#ff5cc8";
+      stageCtx.beginPath();
+      stageCtx.arc(baseX, baseY, 5, 0, Math.PI * 2);
+      stageCtx.fill();
+    }
+
+    function drawSheet() {
+      const canvas = els.sheetCanvas;
+      sheetCtx.clearRect(0, 0, canvas.width, canvas.height);
+      sheetCtx.fillStyle = "#060914";
+      sheetCtx.fillRect(0, 0, canvas.width, canvas.height);
+
+      if (!state.image) return;
+      const s = sheet();
+      const fit = Math.min(canvas.width / state.image.width, canvas.height / state.image.height);
+      const w = state.image.width * fit;
+      const h = state.image.height * fit;
+      const ox = (canvas.width - w) / 2;
+      const oy = (canvas.height - h) / 2;
+
+      if (isPlayerSheet() && els.outlineToggle.checked && state.outlineImage) {
+        sheetCtx.drawImage(state.outlineImage, ox, oy, w, h);
+      }
+      sheetCtx.drawImage(state.image, ox, oy, w, h);
+
+      const cw = state.image.width / s.grid.columns * fit;
+      const ch = state.image.height / s.grid.rows * fit;
+      sheetCtx.strokeStyle = "rgba(66,237,255,0.75)";
+      sheetCtx.lineWidth = 1;
+      for (let c = 0; c <= s.grid.columns; c += 1) {
+        sheetCtx.beginPath();
+        sheetCtx.moveTo(ox + c * cw, oy);
+        sheetCtx.lineTo(ox + c * cw, oy + h);
+        sheetCtx.stroke();
+      }
+      for (let r = 0; r <= s.grid.rows; r += 1) {
+        sheetCtx.beginPath();
+        sheetCtx.moveTo(ox, oy + r * ch);
+        sheetCtx.lineTo(ox + w, oy + r * ch);
+        sheetCtx.stroke();
+      }
+
+      const a = anim();
+      const frame = a.frames[state.frameIndex % a.frames.length];
+      sheetCtx.strokeStyle = "#ffd86b";
+      sheetCtx.lineWidth = 3;
+      sheetCtx.strokeRect(ox + frame * cw, oy + a.row * ch, cw, ch);
+
+      const anc = anchorPx(s, state.image.width / s.grid.columns, state.image.height / s.grid.rows);
+      const ax = ox + frame * cw + anc.x * fit;
+      const ay = oy + a.row * ch + anc.y * fit;
+      sheetCtx.fillStyle = "#ff5cc8";
+      sheetCtx.beginPath();
+      sheetCtx.arc(ax, ay, 4, 0, Math.PI * 2);
+      sheetCtx.fill();
+
+      if (s.baselineY != null) {
+        sheetCtx.strokeStyle = "rgba(255,216,107,0.72)";
+        sheetCtx.beginPath();
+        sheetCtx.moveTo(ox + frame * cw, oy + a.row * ch + s.baselineY * fit);
+        sheetCtx.lineTo(ox + (frame + 1) * cw, oy + a.row * ch + s.baselineY * fit);
+        sheetCtx.stroke();
+      }
+    }
+
+    function updateMeta() {
+      const s = sheet();
+      const a = anim();
+      const imgInfo = state.image
+        ? `${state.image.width}x${state.image.height}`
+        : "not loaded";
+      const cw = state.image ? Math.floor(state.image.width / s.grid.columns) : "-";
+      const ch = state.image ? Math.floor(state.image.height / s.grid.rows) : "-";
+      els.frameLabel.textContent = `${state.animId} frame ${state.frameIndex + 1}/${a.frames.length}`;
+      els.sizeLabel.textContent = imgInfo;
+      els.meta.textContent = [
+        `image: ${state.imageUrl}`,
+        `size: ${imgInfo}`,
+        `grid: ${s.grid.columns}x${s.grid.rows}`,
+        `cell: ${cw}x${ch}`,
+        `anchor: ${JSON.stringify(s.anchor)}`,
+        `baselineY: ${s.baselineY}`,
+        `animation: ${state.animId}`,
+        `row: ${a.row}`,
+        `frames: ${a.frames.join(", ")}`,
+        `outline: ${isPlayerSheet() ? (els.outlineToggle.checked ? "on" : "off") : "n/a"}`
+      ].join("\n");
+    }
+
+    function draw() {
+      drawStage();
+      drawSheet();
+      updateMeta();
+    }
+
+    async function setSheet(id) {
+      state.sheetId = id;
+      state.animId = Object.keys(sheet().animations)[0];
+      populateAnimations();
+      await setImage(sheet().image);
+    }
+
+    function tick(ts) {
+      if (!state.lastTs) state.lastTs = ts;
+      const dt = Math.min(0.1, (ts - state.lastTs) / 1000);
+      state.lastTs = ts;
+      if (state.playing && state.image) {
+        const a = anim();
+        const fps = Number(els.fpsInput.value || a.fps || 8);
+        state.elapsed += dt;
+        const next = Math.floor(state.elapsed * fps) % a.frames.length;
+        if (next !== state.frameIndex) {
+          state.frameIndex = next;
+          draw();
+        }
+      }
+      requestAnimationFrame(tick);
+    }
+
+    els.sheetSelect.addEventListener("change", () => setSheet(els.sheetSelect.value));
+    els.animSelect.addEventListener("change", () => {
+      state.animId = els.animSelect.value;
+      state.frameIndex = 0;
+      state.elapsed = 0;
+      els.fpsInput.value = anim().fps || 8;
+      draw();
+    });
+    els.playBtn.addEventListener("click", () => {
+      state.playing = !state.playing;
+      els.playBtn.classList.toggle("active", state.playing);
+      els.playBtn.textContent = state.playing ? "Play" : "Paused";
+    });
+    els.frameBtn.addEventListener("click", () => {
+      const a = anim();
+      state.frameIndex = (state.frameIndex + 1) % a.frames.length;
+      state.elapsed = state.frameIndex / Number(els.fpsInput.value || a.fps || 8);
+      draw();
+    });
+    els.fpsInput.addEventListener("input", draw);
+    els.scaleInput.addEventListener("input", draw);
+    els.outlineToggle.addEventListener("change", draw);
+    els.fileInput.addEventListener("change", async () => {
+      const file = els.fileInput.files && els.fileInput.files[0];
+      if (!file) return;
+      const url = URL.createObjectURL(file);
+      await setImage(url);
+    });
+
+    populateSheets();
+    populateAnimations();
+    setImage(sheet().image);
+    loadOutlineImage();
+    requestAnimationFrame(tick);
+  </script>
+</body>
+</html>

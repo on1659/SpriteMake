@@ -1,0 +1,26 @@
+﻿{
+  "name": "spritemake-generation-choice",
+  "intended_timing": "when_user_requests_sprite_or_image_creation_without_specifying_generation_path",
+  "script": ".agents/hooks/generation-choice.ps1",
+  "purpose": "Ask whether the user wants keyless Codex direct generation, strict external gpt-image-2 generation, or setup-only SpriteMake scaffolding.",
+  "choices": [
+    {
+      "id": "codex",
+      "label": "Codex direct generation",
+      "meaning": "Create the SpriteMake batch and use Codex's built-in image generation without API keys; model selection is not user-selectable or verified as gpt-image-2."
+    },
+    {
+      "id": "gpt_image_2_external",
+      "label": "Strict gpt-image-2 external generation",
+      "meaning": "Create the gpt-image-2 prompt; the user must paste it into ChatGPT web or another external generation environment."
+    },
+    {
+      "id": "codex_setup",
+      "label": "Codex setup only",
+      "meaning": "Create folders, markdown request docs, gpt-image-2 prompt, manifest, QA, and preview tool; do not generate the image."
+    }
+  ],
+  "note": "This documents the desired prompt-time behavior for SpriteMake agents. Codex must follow AGENTS.md or call this hook; this file alone does not make the Codex runtime execute hooks automatically."
+}
+
+

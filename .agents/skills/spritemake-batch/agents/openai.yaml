@@ -1,0 +1,6 @@
+﻿interface:
+  display_name: "SpriteMake Batch"
+  short_description: "Turn short sprite requests into usable batches"
+  default_prompt: "Use SpriteMake intake for a natural-language sprite request, then set up the batch prompt, manifest, QA, and preview tool."
+
+

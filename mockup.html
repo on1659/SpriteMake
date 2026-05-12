@@ -1,0 +1,1312 @@
+﻿<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SpriteMake Request Builder</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f3f6f1;
+      --ink: #1b241d;
+      --muted: #667064;
+      --panel: rgba(255, 255, 255, 0.94);
+      --line: rgba(42, 62, 45, 0.16);
+      --leaf: #54b15e;
+      --mint: #dff4de;
+      --gold: #f0bd42;
+      --red: #dc574b;
+      --blue: #3a83d9;
+      --grid: rgba(45, 64, 47, 0.22);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background:
+        linear-gradient(45deg, rgba(68, 92, 70, 0.035) 25%, transparent 25%) 0 0 / 22px 22px,
+        linear-gradient(45deg, transparent 75%, rgba(68, 92, 70, 0.035) 75%) 0 0 / 22px 22px,
+        var(--bg);
+      color: var(--ink);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      padding: 14px;
+    }
+
+    .app {
+      width: min(1440px, 100%);
+      margin: 0 auto;
+      display: grid;
+      gap: 10px;
+    }
+
+    .topbar,
+    .flow-panel,
+    .panel,
+    .atlas-panel,
+    .prompt-panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: 0 18px 45px rgba(42, 62, 45, 0.11);
+    }
+
+    .topbar {
+      min-height: 70px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items: center;
+      padding: 12px 14px;
+    }
+
+    h1,
+    h2 {
+      margin: 0;
+      letter-spacing: 0;
+    }
+
+    h1 {
+      font-size: 23px;
+      line-height: 1.12;
+    }
+
+    h2 {
+      font-size: 15px;
+    }
+
+    .sub {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 6px;
+      padding: 4px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(239, 246, 238, 0.78);
+    }
+
+    .tab {
+      min-height: 36px;
+      border: 0;
+      border-radius: 6px;
+      padding: 8px 11px;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .tab.active {
+      color: #17351f;
+      background: #fff;
+      box-shadow: 0 6px 14px rgba(42, 62, 45, 0.12);
+    }
+
+    .flow-panel {
+      padding: 10px 12px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .flow-steps {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .flow-step {
+      min-height: 54px;
+      display: grid;
+      grid-template-columns: 30px minmax(0, 1fr);
+      gap: 8px;
+      align-items: center;
+      text-align: left;
+      background: rgba(248, 250, 247, 0.92);
+    }
+
+    .flow-step .num {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: inline-grid;
+      place-items: center;
+      background: #fff;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font-weight: 900;
+    }
+
+    .flow-step .label {
+      display: grid;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .flow-step strong,
+    .flow-step small {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .flow-step strong {
+      font-size: 13px;
+      line-height: 1.1;
+    }
+
+    .flow-step small {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .flow-step.active {
+      border-color: rgba(84, 177, 94, 0.48);
+      background: #f7fff4;
+    }
+
+    .flow-step.active .num,
+    .flow-step.done .num {
+      background: var(--leaf);
+      color: #fff;
+      border-color: transparent;
+    }
+
+    .flow-step.blocked {
+      opacity: 0.58;
+    }
+
+    .flow-message {
+      min-height: 22px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: 300px minmax(0, 1fr) 380px;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .panel,
+    .atlas-panel,
+    .prompt-panel {
+      padding: 12px;
+    }
+
+    .control-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .section-title {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+    }
+
+    label {
+      display: grid;
+      gap: 5px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+    }
+
+    input,
+    select {
+      min-height: 38px;
+      padding: 8px 9px;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    textarea {
+      min-height: 390px;
+      resize: vertical;
+      padding: 10px;
+      font-size: 12px;
+      line-height: 1.45;
+      font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+    }
+
+    .wide {
+      grid-column: 1 / -1;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    button {
+      min-height: 38px;
+      border: 1px solid rgba(42, 62, 45, 0.18);
+      border-radius: 7px;
+      padding: 8px 12px;
+      background: #fff;
+      color: var(--ink);
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    button.primary {
+      border-color: rgba(84, 177, 94, 0.45);
+      background: linear-gradient(180deg, #b7f48d, #65c962);
+      color: #0e2c17;
+    }
+
+    button:hover {
+      border-color: rgba(42, 62, 45, 0.34);
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.52;
+    }
+
+    .step-pane {
+      display: none;
+    }
+
+    .step-pane.active {
+      display: block;
+    }
+
+    .required {
+      color: var(--red);
+    }
+
+    .mini-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .metric {
+      min-height: 62px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px;
+      background: rgba(247, 250, 246, 0.8);
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 5px;
+      font-size: 18px;
+      line-height: 1.1;
+    }
+
+    .atlas-wrap {
+      position: relative;
+      min-height: 610px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      background:
+        linear-gradient(45deg, #f4f5ee 25%, transparent 25%) 0 0 / 18px 18px,
+        linear-gradient(45deg, transparent 75%, #f4f5ee 75%) 0 0 / 18px 18px,
+        #ffffff;
+    }
+
+    canvas {
+      width: min(100%, 900px);
+      height: auto;
+      display: block;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 28px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 5px 9px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.72);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .swatch {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .checklist {
+      display: grid;
+      gap: 7px;
+      margin-top: 10px;
+    }
+
+    .check {
+      display: grid;
+      grid-template-columns: 22px minmax(0, 1fr);
+      gap: 7px;
+      align-items: start;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px;
+      background: rgba(248, 250, 247, 0.8);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1.35;
+    }
+
+    .check-mark {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: inline-grid;
+      place-items: center;
+      background: var(--leaf);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .issue .check-mark {
+      background: var(--red);
+    }
+
+    .copy-state {
+      min-height: 22px;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    @media (max-width: 1180px) {
+      .workspace {
+        grid-template-columns: 280px minmax(0, 1fr);
+      }
+
+      .prompt-panel {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 760px) {
+      body {
+        padding: 8px;
+      }
+
+      .topbar,
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .tabs {
+        width: 100%;
+      }
+
+      .flow-steps {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .tab {
+        flex: 1;
+      }
+
+      .mini-metrics {
+        grid-template-columns: 1fr;
+      }
+
+      .atlas-wrap {
+        min-height: 360px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div>
+        <h1>SpriteMake Request Builder</h1>
+        <p class="sub">API key 없이 strict atlas, manifest, anchor, QA, animation preview를 세팅하는 batch sprite request tool</p>
+      </div>
+      <nav class="tabs" aria-label="preset tabs">
+        <button class="tab active" type="button" data-preset="character">캐릭터</button>
+        <button class="tab" type="button" data-preset="tilefx">타일 FX</button>
+      </nav>
+    </header>
+
+    <section class="flow-panel" aria-label="resource request flow">
+      <div class="flow-steps">
+        <button class="flow-step active" type="button" data-step="1">
+          <span class="num">1</span>
+          <span class="label"><strong>브리프</strong><small>컨셉과 사용처</small></span>
+        </button>
+        <button class="flow-step blocked" type="button" data-step="2">
+          <span class="num">2</span>
+          <span class="label"><strong>경로</strong><small>프로젝트와 파일</small></span>
+        </button>
+        <button class="flow-step blocked" type="button" data-step="3">
+          <span class="num">3</span>
+          <span class="label"><strong>아틀라스</strong><small>그리드와 앵커</small></span>
+        </button>
+        <button class="flow-step blocked" type="button" data-step="4">
+          <span class="num">4</span>
+          <span class="label"><strong>툴/확인</strong><small>애니메이션 프리뷰</small></span>
+        </button>
+      </div>
+      <div id="flow-message" class="flow-message"></div>
+    </section>
+
+    <section class="workspace">
+      <aside class="panel">
+        <div class="step-pane active" data-step-pane="1">
+          <h2>Resource Brief</h2>
+          <p class="sub">어떤 게임/화면/플레이 상황에서 쓰는 리소스인지 먼저 잡습니다.</p>
+
+          <div class="control-grid">
+            <label class="wide">
+              Game / Concept <span class="required">*</span>
+              <input id="game-concept" type="text" value="Side-view stealing game with small readable characters">
+            </label>
+            <label class="wide">
+              Scene / Screen <span class="required">*</span>
+              <input id="scene-context" type="text" value="Main play lane, drawn over a flat road or floor">
+            </label>
+            <label class="wide">
+              Gameplay Role <span class="required">*</span>
+              <input id="gameplay-role" type="text" value="Player and NPC bodies placed by foot contact">
+            </label>
+            <label class="wide">
+              Player Purpose <span class="required">*</span>
+              <input id="player-purpose" type="text" value="The player must instantly read idle, sneak, stealing, and stunned states">
+            </label>
+            <label class="wide">
+              Visual Direction <span class="required">*</span>
+              <input id="visual-direction" type="text" value="Cute, compact, crisp-edged, readable at small size">
+            </label>
+            <label class="wide">
+              Style Match <span class="required">*</span>
+              <input id="style-reference" type="text" value="Match existing side-view character proportions and outline weight">
+            </label>
+            <label class="wide">
+              In-Game Scale <span class="required">*</span>
+              <input id="in-game-scale" type="text" value="Around 96px tall on screen">
+            </label>
+          </div>
+        </div>
+
+        <div class="step-pane" data-step-pane="2">
+          <h2>Output Paths</h2>
+          <p class="sub">어느 프로젝트에 들어갈지와 최종 파일 경로를 먼저 고정합니다.</p>
+
+          <div class="control-grid">
+            <label class="wide">
+              Game Project Root <span class="required">*</span>
+              <input id="project-root" type="text" value="D:\Work\LAMDiceBot">
+            </label>
+            <label class="wide">
+              Target Asset Path <span class="required">*</span>
+              <input id="path" type="text" value="assets/characters/player-atlas.png">
+            </label>
+            <label class="wide">
+              Source / Reference Path
+              <input id="reference-path" type="text" value="">
+            </label>
+            <label class="wide">
+              Generation Provider
+              <input id="generation-provider" type="text" value="OpenAI Images API" readonly>
+            </label>
+            <label class="wide">
+              Required Image Model
+              <input id="generation-model" type="text" value="gpt-image-2" readonly>
+            </label>
+            <label class="wide">
+              Asset Type
+              <select id="asset-type">
+                <option value="character">Character sprite atlas</option>
+                <option value="fx">Tile / FX sprite atlas</option>
+                <option value="item">Item sprite atlas</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div class="step-pane" data-step-pane="3">
+          <h2>Atlas Contract</h2>
+          <p class="sub">코드가 자르는 기준값입니다.</p>
+
+          <div class="control-grid">
+            <label>
+              Width
+              <input id="width" type="number" min="64" step="1" value="1536">
+            </label>
+            <label>
+              Height
+              <input id="height" type="number" min="64" step="1" value="1728">
+            </label>
+            <label>
+              Columns
+              <input id="cols" type="number" min="1" max="12" step="1" value="4">
+            </label>
+            <label>
+              Rows
+              <input id="rows" type="number" min="1" max="12" step="1" value="6">
+            </label>
+            <label>
+              Anchor X
+              <input id="anchor-x" type="number" min="0" step="1" value="192">
+            </label>
+            <label>
+              Anchor Y
+              <input id="anchor-y" type="number" min="0" step="1" value="252">
+            </label>
+            <label class="wide">
+              Rows <span class="required">*</span>
+              <input id="row-desc" type="text" value="red, orange, yellow, green, blue, violet">
+            </label>
+            <label class="wide">
+              Columns <span class="required">*</span>
+              <input id="col-desc" type="text" value="idle, sneak, steal, stunned">
+            </label>
+          </div>
+        </div>
+
+        <div class="step-pane" data-step-pane="4">
+          <h2>Animation Tool & Review</h2>
+          <p class="sub">최종 PNG를 보기만 하지 말고, 재생/크롭/앵커를 확인하는 로컬 HTML 툴까지 같이 만듭니다.</p>
+
+          <div class="control-grid">
+            <label class="wide">
+              Animation Tool Path <span class="required">*</span>
+              <input id="animation-tool-path" type="text" value="tools/sprite-player.html">
+            </label>
+            <label class="wide">
+              Preview Manifest Path <span class="required">*</span>
+              <input id="animation-manifest-path" type="text" value="assets/characters/player-atlas.manifest.json">
+            </label>
+          </div>
+
+          <div class="mini-metrics">
+            <div class="metric">
+              <span>Cell</span>
+              <strong id="cell-metric">384x288</strong>
+            </div>
+            <div class="metric">
+              <span>Anchor</span>
+              <strong id="anchor-metric">192,252</strong>
+            </div>
+            <div class="metric">
+              <span>Grid</span>
+              <strong id="grid-metric">4x6</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="reset" type="button">초기화</button>
+          <button id="flow-prev" type="button">이전</button>
+          <button id="flow-next" type="button">다음</button>
+          <button id="copy" class="primary" type="button">프롬프트 복사</button>
+        </div>
+      </aside>
+
+      <section class="atlas-panel">
+        <h2>Visual Contract Preview</h2>
+        <p class="sub">초록 점은 contact anchor, 빨간 선은 Y축 baseline입니다.</p>
+        <div class="atlas-wrap">
+          <canvas id="atlas" width="900" height="640"></canvas>
+        </div>
+        <div class="legend">
+          <span><i class="swatch" style="background: var(--grid)"></i>exact cell boundary</span>
+          <span><i class="swatch" style="background: var(--leaf)"></i>contact anchor</span>
+          <span><i class="swatch" style="background: var(--red)"></i>Y-axis baseline</span>
+          <span><i class="swatch" style="background: var(--gold)"></i>source plane</span>
+        </div>
+      </section>
+
+      <aside class="prompt-panel">
+        <h2>Generated Prompt</h2>
+        <p class="sub">이 블록을 이미지 생성/외주 요청에 붙이면 됩니다.</p>
+        <textarea id="prompt" spellcheck="false"></textarea>
+        <div id="copy-state" class="copy-state"></div>
+
+        <h2 style="margin-top:12px">QA Checklist</h2>
+        <div id="checklist" class="checklist"></div>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    const presets = {
+      character: {
+        gameConcept: "Side-view stealing game with small readable characters",
+        sceneContext: "Main play lane, drawn over a flat road or floor",
+        gameplayRole: "Player and NPC bodies placed by foot contact",
+        playerPurpose: "The player must instantly read idle, sneak, stealing, and stunned states",
+        visualDirection: "Cute, compact, crisp-edged, readable at small size",
+        styleReference: "Match existing side-view character proportions and outline weight",
+        inGameScale: "Around 96px tall on screen",
+        projectRoot: "D:\\Work\\LAMDiceBot",
+        referencePath: "",
+        generationProvider: "OpenAI Images API",
+        generationModel: "gpt-image-2",
+        animationToolPath: "tools/sprite-player.html",
+        animationManifestPath: "assets/characters/player-atlas.manifest.json",
+        width: 1536,
+        height: 1728,
+        cols: 4,
+        rows: 6,
+        anchorX: 192,
+        anchorY: 252,
+        assetType: "character",
+        path: "assets/characters/player-atlas.png",
+        rowDesc: "red, orange, yellow, green, blue, violet",
+        colDesc: "idle, sneak, steal, stunned",
+        anchorMeaning: "side-view foot and bag ground contact baseline",
+        style: "Cute side-view game characters, readable at small canvas size"
+      },
+      tilefx: {
+        gameConcept: "Tile-based game with dimetric glass floor states",
+        sceneContext: "Gameplay floor tile under or near a character",
+        gameplayRole: "Feedback FX that tells the player whether a tile is safe, warning, cracking, broken, landing, or restored",
+        playerPurpose: "The player must instantly read tile safety, damage, breaking, landing, and restoration states",
+        visualDirection: "Crisp dimetric tile FX with fixed source plane and readable state changes",
+        styleReference: "Match existing 2:1 dimetric tile art and FX outline weight",
+        inGameScale: "One tile-sized effect at gameplay zoom",
+        projectRoot: "D:\\Work\\LAMDiceBot",
+        referencePath: "",
+        generationProvider: "OpenAI Images API",
+        generationModel: "gpt-image-2",
+        animationToolPath: "tools/fx-player.html",
+        animationManifestPath: "assets/fx/tile-fx-atlas.manifest.json",
+        width: 1400,
+        height: 1309,
+        cols: 4,
+        rows: 7,
+        anchorX: 175,
+        anchorY: 165,
+        assetType: "fx",
+        path: "assets/fx/tile-fx-atlas.png",
+        rowDesc: "safe_sparkle, warning_glow, crack, break_shards, fall_trail, landing_pulse, restore_glass",
+        colDesc: "frame 0, frame 1, frame 2, frame 3",
+        anchorMeaning: "character foot contact point on the glass tile, not the diamond visual center",
+        style: "Dimetric 2:1 isometric tile FX with crisp pixel-art edges"
+      }
+    };
+
+    const els = {
+      gameConcept: document.getElementById("game-concept"),
+      sceneContext: document.getElementById("scene-context"),
+      gameplayRole: document.getElementById("gameplay-role"),
+      playerPurpose: document.getElementById("player-purpose"),
+      visualDirection: document.getElementById("visual-direction"),
+      styleReference: document.getElementById("style-reference"),
+      inGameScale: document.getElementById("in-game-scale"),
+      projectRoot: document.getElementById("project-root"),
+      referencePath: document.getElementById("reference-path"),
+      generationProvider: document.getElementById("generation-provider"),
+      generationModel: document.getElementById("generation-model"),
+      animationToolPath: document.getElementById("animation-tool-path"),
+      animationManifestPath: document.getElementById("animation-manifest-path"),
+      width: document.getElementById("width"),
+      height: document.getElementById("height"),
+      cols: document.getElementById("cols"),
+      rows: document.getElementById("rows"),
+      anchorX: document.getElementById("anchor-x"),
+      anchorY: document.getElementById("anchor-y"),
+      assetType: document.getElementById("asset-type"),
+      path: document.getElementById("path"),
+      rowDesc: document.getElementById("row-desc"),
+      colDesc: document.getElementById("col-desc"),
+      prompt: document.getElementById("prompt"),
+      copyState: document.getElementById("copy-state"),
+      flowMessage: document.getElementById("flow-message"),
+      flowPrev: document.getElementById("flow-prev"),
+      flowNext: document.getElementById("flow-next"),
+      copyButton: document.getElementById("copy"),
+      cellMetric: document.getElementById("cell-metric"),
+      anchorMetric: document.getElementById("anchor-metric"),
+      gridMetric: document.getElementById("grid-metric"),
+      checklist: document.getElementById("checklist"),
+      canvas: document.getElementById("atlas")
+    };
+
+    let activePreset = "character";
+    let activeStep = 1;
+
+    function readConfig() {
+      const width = Math.max(1, Number(els.width.value) || 1);
+      const height = Math.max(1, Number(els.height.value) || 1);
+      const cols = Math.max(1, Number(els.cols.value) || 1);
+      const rows = Math.max(1, Number(els.rows.value) || 1);
+      return {
+        gameConcept: els.gameConcept.value.trim(),
+        sceneContext: els.sceneContext.value.trim(),
+        gameplayRole: els.gameplayRole.value.trim(),
+        playerPurpose: els.playerPurpose.value.trim(),
+        visualDirection: els.visualDirection.value.trim(),
+        styleReference: els.styleReference.value.trim(),
+        inGameScale: els.inGameScale.value.trim(),
+        projectRoot: els.projectRoot.value.trim(),
+        referencePath: els.referencePath.value.trim(),
+        generationProvider: els.generationProvider.value.trim(),
+        generationModel: els.generationModel.value.trim(),
+        animationToolPath: els.animationToolPath.value.trim(),
+        animationManifestPath: els.animationManifestPath.value.trim(),
+        width,
+        height,
+        cols,
+        rows,
+        cellW: Math.floor(width / cols),
+        cellH: Math.floor(height / rows),
+        modW: width % cols,
+        modH: height % rows,
+        anchorX: Number(els.anchorX.value) || 0,
+        anchorY: Number(els.anchorY.value) || 0,
+        assetType: els.assetType.value,
+        path: els.path.value.trim(),
+        rowDesc: els.rowDesc.value.trim(),
+        colDesc: els.colDesc.value.trim(),
+        anchorMeaning: presets[activePreset].anchorMeaning,
+        style: presets[activePreset].style
+      };
+    }
+
+    function boundaries(step, count) {
+      return Array.from({ length: count + 1 }, (_, i) => i * step).join(", ");
+    }
+
+    function makePrompt(config) {
+      const yContract = config.assetType === "fx"
+        ? `- All FX rows derived from the same source object must preserve the same local plane Y.\n- crack, break_shards, landing_pulse, warning_glow, and restore states must line up on the same plane.\n- Moving shards, particles, glow, and trails may animate, but the original source plane must not jump.`
+        : `- The local Y baseline must not change between animation rows or frames.\n- Grounded frames must share the same contact anchor Y: y=${config.anchorY}.\n- Leaning, crouching, jumping, or hit reactions may change silhouette, but the ground reference must not drift.`;
+
+      return `Resource Request Brief:
+- Game / concept: ${config.gameConcept}
+- Scene or screen where this appears: ${config.sceneContext}
+- Gameplay role: ${config.gameplayRole}
+- Player-readable purpose: ${config.playerPurpose}
+- Visual direction: ${config.visualDirection}
+- Existing assets or style to match: ${config.styleReference}
+- In-game display scale: ${config.inGameScale}
+- Target file path: ${config.path}
+
+Project Paths:
+- Game project root: ${config.projectRoot}
+- Target asset path: ${config.path}
+- Source/reference path: ${config.referencePath || "none specified"}
+
+Generation Target:
+- Provider: ${config.generationProvider}
+- Required image model: ${config.generationModel}
+- Use ${config.generationModel} for image generation or editing.
+- Do not silently substitute another image model. If ${config.generationModel} is unavailable, stop and report that the model requirement cannot be met.
+- SpriteMake does not store API keys or call the API directly; this model requirement is guaranteed only by a strict external generation step.
+- Codex direct keyless generation may be used for convenience, but its model is not forced or verified as gpt-image-2.
+
+Animation Preview Tool Request:
+- Also create a local HTML animation preview/production tool for this asset.
+- Copy and adapt the generic SpriteMake animation player template instead of writing a one-off viewer from scratch.
+- Tool output path: ${config.animationToolPath}
+- Preview manifest path: ${config.animationManifestPath}
+- The tool must load the target PNG through the manifest, play each animation row/frame, expose sheet/animation/palette/FPS/scale controls, and show both an animation stage and the full sprite sheet.
+- The tool must draw exact cell grid lines, selected frame bounds, contact anchor, Y-axis baseline/source plane, image size, cell size, alpha bbox, and path metadata.
+- Use project-relative or user-configurable paths in the tool. Do not hardcode machine-specific source paths.
+
+Create a transparent PNG-32 RGBA sprite atlas for a game.
+
+This must be a strict sprite atlas, not a loosely spaced contact sheet.
+
+Target file path:
+- ${config.path}
+
+Canvas:
+- Final image size: exactly ${config.width}x${config.height}px
+- Grid: exactly ${config.cols} columns x ${config.rows} rows
+- Cell size: exactly ${config.cellW}x${config.cellH}px
+- Column boundaries: x=${boundaries(config.cellW, config.cols)}
+- Row boundaries: y=${boundaries(config.cellH, config.rows)}
+- No gutters
+- No outer padding outside the exact canvas
+- No guide grid
+- No labels
+- No text
+- Fully transparent background
+- PNG-32 RGBA, straight alpha, sRGB
+
+Runtime slicing rule:
+- The game slices frames only by the exact grid boundaries above.
+- Each cell must contain exactly one complete frame.
+- Do not rely on visual spacing or manual cropping.
+- No frame may bleed into another cell.
+- No cell may be empty.
+- Transparent padding may exist only inside each fixed ${config.cellW}x${config.cellH} cell.
+
+Rows:
+- ${config.rowDesc}
+
+Columns:
+- ${config.colDesc}
+
+Anchor Contract:
+- Contact anchor is x=${config.anchorX}, y=${config.anchorY} inside every ${config.cellW}x${config.cellH} cell.
+- This anchor means: ${config.anchorMeaning}.
+- This anchor is not the visual center.
+- Do not move the contact anchor to the visual center.
+
+Y-Axis Alignment Contract:
+${yContract}
+
+Visual Requirements:
+- ${config.style}
+- Keep silhouette, angle, lighting, and scale consistent across frames.
+- Effects may extend inside the cell, but must not bleed into adjacent cells.
+
+Do Not:
+- Do not change final size, grid, row order, or column order.
+- Do not premultiply alpha.
+- Do not crop body parts or important effects.
+- Do not draw multiple unrelated poses in one cell.
+
+Output Report:
+- Final image size
+- Alpha bbox
+- Alpha bbox per cell if possible
+- Confirm PNG-32 RGBA straight alpha
+- Confirm anchor x=${config.anchorX}, y=${config.anchorY}
+- Confirm Y baseline did not drift across rows/frames`;
+    }
+
+    function drawPreview(config) {
+      const canvas = els.canvas;
+      const ctx = canvas.getContext("2d");
+      const pad = 28;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const scale = Math.min((canvas.width - pad * 2) / config.width, (canvas.height - pad * 2) / config.height);
+      const drawW = config.width * scale;
+      const drawH = config.height * scale;
+      const ox = (canvas.width - drawW) / 2;
+      const oy = (canvas.height - drawH) / 2;
+      const cellW = config.cellW * scale;
+      const cellH = config.cellH * scale;
+
+      ctx.save();
+      ctx.fillStyle = "#fff";
+      ctx.strokeStyle = "rgba(42, 62, 45, 0.28)";
+      ctx.lineWidth = 2;
+      roundRect(ctx, ox, oy, drawW, drawH, 8);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.strokeStyle = "rgba(45, 64, 47, 0.28)";
+      ctx.lineWidth = 1;
+      for (let c = 1; c < config.cols; c += 1) {
+        const x = ox + c * cellW;
+        ctx.beginPath();
+        ctx.moveTo(x, oy);
+        ctx.lineTo(x, oy + drawH);
+        ctx.stroke();
+      }
+      for (let r = 1; r < config.rows; r += 1) {
+        const y = oy + r * cellH;
+        ctx.beginPath();
+        ctx.moveTo(ox, y);
+        ctx.lineTo(ox + drawW, y);
+        ctx.stroke();
+      }
+
+      for (let r = 0; r < config.rows; r += 1) {
+        for (let c = 0; c < config.cols; c += 1) {
+          const x = ox + c * cellW;
+          const y = oy + r * cellH;
+          const anchorX = x + config.anchorX * scale;
+          const anchorY = y + config.anchorY * scale;
+          drawGhostSprite(ctx, x, y, cellW, cellH, anchorX, anchorY, config.assetType, r, c);
+        }
+      }
+
+      ctx.strokeStyle = "#dc574b";
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([8, 6]);
+      for (let r = 0; r < config.rows; r += 1) {
+        const y = oy + r * cellH + config.anchorY * scale;
+        ctx.beginPath();
+        ctx.moveTo(ox, y);
+        ctx.lineTo(ox + drawW, y);
+        ctx.stroke();
+      }
+      ctx.setLineDash([]);
+
+      ctx.fillStyle = "rgba(27, 36, 29, 0.88)";
+      ctx.font = "800 12px ui-sans-serif, system-ui";
+      ctx.textAlign = "left";
+      ctx.fillText(`${config.width}x${config.height} / ${config.cols}x${config.rows}`, ox, oy - 10);
+
+      if (config.modW !== 0 || config.modH !== 0) {
+        ctx.fillStyle = "#dc574b";
+        ctx.textAlign = "right";
+        ctx.fillText(`not divisible: ${config.modW}, ${config.modH}`, ox + drawW, oy - 10);
+      }
+      ctx.restore();
+    }
+
+    function drawGhostSprite(ctx, x, y, w, h, ax, ay, type, row, col) {
+      ctx.save();
+      ctx.globalAlpha = 0.9;
+      const hue = (row * 47 + col * 16) % 360;
+      const fill = `hsl(${hue} 62% 58%)`;
+
+      if (type === "fx") {
+        ctx.strokeStyle = "#f0bd42";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.ellipse(ax, ay - h * 0.18, w * 0.26, h * 0.1, 0, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.fillStyle = "rgba(240, 189, 66, 0.18)";
+        ctx.beginPath();
+        ctx.ellipse(ax, ay - h * 0.18, w * 0.22, h * 0.07, 0, 0, Math.PI * 2);
+        ctx.fill();
+        for (let i = 0; i < 5; i += 1) {
+          ctx.fillStyle = `hsla(${hue}, 80%, 58%, 0.62)`;
+          ctx.beginPath();
+          ctx.arc(ax + (i - 2) * w * 0.06, ay - h * (0.28 + i * 0.025), 3.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      } else {
+        ctx.fillStyle = "rgba(42, 62, 45, 0.12)";
+        ctx.beginPath();
+        ctx.ellipse(ax, ay, w * 0.17, h * 0.035, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = fill;
+        ctx.strokeStyle = "rgba(27, 36, 29, 0.74)";
+        ctx.lineWidth = 2;
+        roundRect(ctx, ax - w * 0.09, ay - h * 0.36, w * 0.18, h * 0.24, 8);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = "#ffd2a3";
+        ctx.beginPath();
+        ctx.arc(ax, ay - h * 0.46, Math.max(8, w * 0.055), 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        if (col === 1 || col === 2) {
+          ctx.strokeStyle = "rgba(27, 36, 29, 0.68)";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(ax - w * 0.12, ay - h * 0.28);
+          ctx.lineTo(ax - w * 0.2, ay - h * 0.2);
+          ctx.stroke();
+        }
+
+        if (col === 3) {
+          ctx.strokeStyle = "#dc574b";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(ax + w * 0.11, ay - h * 0.62);
+          ctx.lineTo(ax + w * 0.25, ay - h * 0.78);
+          ctx.stroke();
+        }
+      }
+
+      ctx.fillStyle = "#54b15e";
+      ctx.beginPath();
+      ctx.arc(ax, ay, 4.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function roundRect(ctx, x, y, w, h, r) {
+      const rr = Math.min(r, w / 2, h / 2);
+      ctx.beginPath();
+      ctx.moveTo(x + rr, y);
+      ctx.arcTo(x + w, y, x + w, y + h, rr);
+      ctx.arcTo(x + w, y + h, x, y + h, rr);
+      ctx.arcTo(x, y + h, x, y, rr);
+      ctx.arcTo(x, y, x + w, y, rr);
+      ctx.closePath();
+    }
+
+    function getFlowStatus(config) {
+      const briefDone = Boolean(
+        config.gameConcept &&
+        config.sceneContext &&
+        config.gameplayRole &&
+        config.playerPurpose &&
+        config.visualDirection &&
+        config.styleReference &&
+        config.inGameScale
+      );
+      const pathsDone = Boolean(config.projectRoot && config.path && config.generationModel === "gpt-image-2");
+      const anchorInside = config.anchorX >= 0 &&
+        config.anchorX <= config.cellW &&
+        config.anchorY >= 0 &&
+        config.anchorY <= config.cellH;
+      const atlasDone = config.modW === 0 &&
+        config.modH === 0 &&
+        anchorInside &&
+        config.rowDesc.length > 0 &&
+        config.colDesc.length > 0;
+      const toolDone = Boolean(config.animationToolPath && config.animationManifestPath);
+
+      return {
+        1: briefDone,
+        2: pathsDone,
+        3: atlasDone,
+        4: briefDone && pathsDone && atlasDone && toolDone
+      };
+    }
+
+    function firstIncompleteStep(status) {
+      for (let step = 1; step <= 3; step += 1) {
+        if (!status[step]) return step;
+      }
+      return status[4] ? null : 4;
+    }
+
+    function firstBlockedStepFor(targetStep, status) {
+      for (let step = 1; step < targetStep; step += 1) {
+        if (!status[step]) return step;
+      }
+      return null;
+    }
+
+    function stepMessage(step, status) {
+      if (status[4]) return "4단계까지 완료. 프롬프트 복사가 가능합니다.";
+      if (!status[step]) {
+        if (step === 1) return "1단계 필수 브리프를 채우면 2단계 경로로 넘어갈 수 있습니다.";
+        if (step === 2) return "2단계 프로젝트 루트와 최종 파일 경로를 채워야 합니다.";
+        if (step === 3) return "3단계 그리드, 앵커, row/column 의미를 통과시켜야 합니다.";
+        if (step === 4) return "4단계 animation tool path와 preview manifest path를 채워야 합니다.";
+        return "앞 단계가 모두 완료되어야 복사할 수 있습니다.";
+      }
+      return `${step}단계 완료. 다음 단계로 진행하세요.`;
+    }
+
+    function updateFlow(config) {
+      const status = getFlowStatus(config);
+      const blockedStep = firstBlockedStepFor(activeStep, status);
+      if (blockedStep) activeStep = blockedStep;
+
+      document.querySelectorAll("[data-step-pane]").forEach((pane) => {
+        pane.classList.toggle("active", Number(pane.dataset.stepPane) === activeStep);
+      });
+
+      document.querySelectorAll(".flow-step").forEach((button) => {
+        const step = Number(button.dataset.step);
+        const blocked = firstBlockedStepFor(step, status) !== null;
+        button.classList.toggle("active", step === activeStep);
+        button.classList.toggle("done", Boolean(status[step]));
+        button.classList.toggle("blocked", blocked);
+        button.setAttribute("aria-disabled", blocked ? "true" : "false");
+      });
+
+      els.flowPrev.disabled = activeStep === 1;
+      els.flowNext.disabled = activeStep === 4 && status[4];
+      els.flowNext.textContent = activeStep === 4 ? (status[4] ? "완료" : "확인") : "다음";
+      els.copyButton.disabled = !status[4];
+      els.flowMessage.textContent = stepMessage(activeStep, status);
+      return status;
+    }
+
+    function goToStep(step) {
+      const config = readConfig();
+      const status = getFlowStatus(config);
+      const blockedStep = firstBlockedStepFor(step, status);
+      if (blockedStep) {
+        activeStep = blockedStep;
+        update();
+        els.flowMessage.textContent = `${blockedStep}단계를 먼저 완료해야 ${step}단계로 갈 수 있습니다.`;
+        return;
+      }
+      activeStep = step;
+      update();
+    }
+
+    function updateChecklist(config) {
+      const status = getFlowStatus(config);
+      const checks = [
+        [status[1], "1단계 resource brief가 완료됨"],
+        [status[2], "2단계 프로젝트/파일 경로가 완료됨"],
+        [status[3], "3단계 atlas contract가 완료됨"],
+        [Boolean(config.animationToolPath && config.animationManifestPath), "4단계 animation preview tool 경로가 완료됨"],
+        [config.modW === 0 && config.modH === 0, `이미지 크기가 grid로 나누어짐: mod ${config.modW}, ${config.modH}`],
+        [config.anchorX >= 0 && config.anchorX <= config.cellW && config.anchorY >= 0 && config.anchorY <= config.cellH, "anchor가 셀 내부에 있음"],
+        [config.path.length > 0, "runtime path가 명시됨"],
+        [config.rowDesc.length > 0 && config.colDesc.length > 0, "row/column 의미가 명시됨"],
+        [true, "Y-axis baseline을 anchor와 별도 계약으로 명시함"],
+        [true, "PNG-32 RGBA straight alpha를 요구함"]
+      ];
+
+      els.checklist.innerHTML = checks.map(([ok, text]) => `
+        <div class="check ${ok ? "" : "issue"}">
+          <span class="check-mark">${ok ? "✓" : "!"}</span>
+          <span>${text}</span>
+        </div>
+      `).join("");
+    }
+
+    function update() {
+      const config = readConfig();
+      els.cellMetric.textContent = `${config.cellW}x${config.cellH}`;
+      els.anchorMetric.textContent = `${config.anchorX},${config.anchorY}`;
+      els.gridMetric.textContent = `${config.cols}x${config.rows}`;
+      els.prompt.value = makePrompt(config);
+      drawPreview(config);
+      updateChecklist(config);
+      updateFlow(config);
+      window.__spriteGuideState = config;
+    }
+
+    function applyPreset(name) {
+      activePreset = name;
+      const p = presets[name];
+      els.gameConcept.value = p.gameConcept;
+      els.sceneContext.value = p.sceneContext;
+      els.gameplayRole.value = p.gameplayRole;
+      els.playerPurpose.value = p.playerPurpose;
+      els.visualDirection.value = p.visualDirection;
+      els.styleReference.value = p.styleReference;
+      els.inGameScale.value = p.inGameScale;
+      els.projectRoot.value = p.projectRoot;
+      els.referencePath.value = p.referencePath;
+      els.generationProvider.value = p.generationProvider;
+      els.generationModel.value = p.generationModel;
+      els.animationToolPath.value = p.animationToolPath;
+      els.animationManifestPath.value = p.animationManifestPath;
+      els.width.value = p.width;
+      els.height.value = p.height;
+      els.cols.value = p.cols;
+      els.rows.value = p.rows;
+      els.anchorX.value = p.anchorX;
+      els.anchorY.value = p.anchorY;
+      els.assetType.value = p.assetType;
+      els.path.value = p.path;
+      els.rowDesc.value = p.rowDesc;
+      els.colDesc.value = p.colDesc;
+      document.querySelectorAll(".tab").forEach((tab) => {
+        tab.classList.toggle("active", tab.dataset.preset === name);
+      });
+      update();
+    }
+
+    document.querySelectorAll("input, select").forEach((input) => {
+      input.addEventListener("input", update);
+      input.addEventListener("change", update);
+    });
+    document.querySelectorAll(".tab").forEach((button) => {
+      button.addEventListener("click", () => applyPreset(button.dataset.preset));
+    });
+    document.querySelectorAll(".flow-step").forEach((button) => {
+      button.addEventListener("click", () => goToStep(Number(button.dataset.step)));
+    });
+    document.getElementById("reset").addEventListener("click", () => {
+      activeStep = 1;
+      applyPreset(activePreset);
+    });
+    els.flowPrev.addEventListener("click", () => goToStep(Math.max(1, activeStep - 1)));
+    els.flowNext.addEventListener("click", () => {
+      if (activeStep < 4) {
+        goToStep(activeStep + 1);
+      } else {
+        const status = getFlowStatus(readConfig());
+        const firstIncomplete = firstIncompleteStep(status);
+        if (firstIncomplete) goToStep(firstIncomplete);
+      }
+    });
+    document.getElementById("copy").addEventListener("click", async () => {
+      const status = getFlowStatus(readConfig());
+      if (!status[4]) {
+        const firstIncomplete = firstIncompleteStep(status) || 1;
+        goToStep(firstIncomplete);
+        els.copyState.textContent = `${firstIncomplete}단계를 먼저 완료해야 복사할 수 있습니다.`;
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(els.prompt.value);
+        els.copyState.textContent = "프롬프트를 클립보드에 복사했습니다.";
+      } catch {
+        els.prompt.select();
+        els.copyState.textContent = "텍스트를 선택했습니다.";
+      }
+    });
+
+    window.render_game_to_text = () => {
+      const config = readConfig();
+      const flowStatus = getFlowStatus(config);
+      return JSON.stringify({
+        page: "sprite-guide-mockup",
+        preset: activePreset,
+        activeStep,
+        size: [config.width, config.height],
+        grid: [config.cols, config.rows],
+        cell: [config.cellW, config.cellH],
+        anchor: [config.anchorX, config.anchorY],
+        briefComplete: flowStatus[1],
+        pathComplete: flowStatus[2],
+        generationModel: config.generationModel,
+        atlasComplete: flowStatus[3],
+        animationToolComplete: Boolean(config.animationToolPath && config.animationManifestPath),
+        flowComplete: flowStatus[4],
+        divisible: config.modW === 0 && config.modH === 0,
+        promptLength: els.prompt.value.length
+      });
+    };
+
+    update();
+  </script>
+</body>
+</html>
+
+

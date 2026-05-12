@@ -1,0 +1,91 @@
+﻿{
+    "batchId":  "horse-lose-poses-2026-05-05",
+    "assetId":  "bird-lose",
+    "vehicleId":  "bird",
+    "state":  "lose",
+    "phase":  2,
+    "status":  "generated-svg-preview-ready-from-base-inline-run-reference",
+    "requiredImageModel":  "gpt-image-2",
+    "targetGameAssetPath":  "assets/horse-race/sprites/lose/bird-lose.png",
+    "localGeneratedPath":  "../generated/bird-lose.svg",
+    "localFinalPath":  "../final/bird-lose.svg",
+    "promptPath":  "../prompts/bird-lose-prompt.md",
+    "qaReportPath":  "../qa/bird-lose-qa.md",
+    "sourceReferences":  [
+                             {
+                                 "path":  "D:/Work/LAMDiceBot/js/horse-race-sprites.js",
+                                 "vehicleDefinitionLine":  91,
+                                 "state":  "base svgMap run.frame1",
+                                 "note":  "Use the base inline SVG run.frame1 as the mandatory style reference; do not use POWER_VEHICLE_VARIANT_OVERRIDES or booster art."
+                             }
+                         ],
+    "sheets":  {
+                   "bird-lose":  {
+                                     "label":  "bird lose atlas",
+                                     "image":  "../generated/bird-lose.svg",
+                                     "finalImage":  "../final/bird-lose.svg",
+                                     "grid":  {
+                                                  "columns":  2,
+                                                  "rows":  1
+                                              },
+                                     "canvas":  {
+                                                    "width":  120,
+                                                    "height":  45
+                                                },
+                                     "cellSize":  {
+                                                      "width":  60,
+                                                      "height":  45
+                                                  },
+                                     "columnBoundaries":  [
+                                                              0,
+                                                              60,
+                                                              120
+                                                          ],
+                                     "rowBoundaries":  [
+                                                           0,
+                                                           45
+                                                       ],
+                                     "anchor":  {
+                                                    "x":  30,
+                                                    "y":  45,
+                                                    "mode":  "pixel",
+                                                    "meaning":  "track ground contact at bottom center"
+                                                },
+                                     "baselineY":  45,
+                                     "baselineMeaning":  "vehicle feet/bottom contact with track ground; must not drift between frames",
+                                     "defaultScale":  4,
+                                     "rows":  {
+                                                  "0":  "lose pose"
+                                              },
+                                     "columns":  {
+                                                     "0":  "날개 접고 머리 숙임",
+                                                     "1":  "깃털과 머리가 1px 움직임"
+                                                 },
+                                     "animations":  {
+                                                        "lose":  {
+                                                                     "row":  0,
+                                                                     "frames":  [
+                                                                                    0,
+                                                                                    1
+                                                                                ],
+                                                                     "fps":  3.3333333333,
+                                                                     "durationMs":  600,
+                                                                     "loop":  true,
+                                                                     "frameMeanings":  [
+                                                                                           "날개 접고 머리 숙임",
+                                                                                           "깃털과 머리가 1px 움직임"
+                                                                                       ]
+                                                                 }
+                                                    },
+                                     "visualDirection":  "파란/노란 작은 새, 양 날개 몸통에 붙임, 머리 살짝 숙임, 깃털 1개 떨어지는 효과",
+                                     "qa":  {
+                                                "alphaBbox":  null,
+                                                "perCellBbox":  [
+
+                                                                ],
+                                                "status":  "pending until generated PNG exists"
+                                            },
+                                     "sourceFormat":  "svg-atlas"
+                                 }
+               }
+}

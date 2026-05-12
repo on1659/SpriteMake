@@ -1,0 +1,27 @@
+{
+  "name": "spritemake-mini-symphony",
+  "intended_timing": "after_sprite_intake_or_when_reviewing_output_batches",
+  "script": ".agents/hooks/symphony.ps1",
+  "purpose": "Scan output/* SpriteMake batch folders as a lightweight control plane, classify each batch state, and suggest the next production action without calling image APIs or moving assets.",
+  "default_command": ".agents/hooks/symphony.ps1",
+  "write_report_command": ".agents/hooks/symphony.ps1 -WriteReport",
+  "report_output": "output/SYMPHONY.md",
+  "states": [
+    "needs-scaffold",
+    "needs-prompt",
+    "needs-prompt-inject",
+    "needs-refine",
+    "prompt-ready",
+    "qa-needed",
+    "needs-regeneration",
+    "mixed-review",
+    "final-review",
+    "final-candidate"
+  ],
+  "rules": [
+    "Never store or use API keys.",
+    "Never call image generation APIs from SpriteMake.",
+    "Never move PNG files into final/ unless QA passes.",
+    "Keep contact anchor and Y-axis baseline/source plane explicit."
+  ]
+}

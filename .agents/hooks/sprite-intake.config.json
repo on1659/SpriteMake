@@ -1,0 +1,32 @@
+﻿{
+  "name": "spritemake-sprite-intake",
+  "intended_timing": "when_user_requests_sprite_or_image_creation_in_natural_language",
+  "script": ".agents/hooks/sprite-intake.ps1",
+  "purpose": "Capture a short natural-language sprite request, infer a timestamped output batch folder, create SpriteMake markdown scaffolding, write PROMPT.md, and support keyless Codex direct generation without storing API keys.",
+  "default_output": "output/{inferred-name}-{yyyyMMdd-HHmmss}/",
+  "creates": [
+    "BATCH.md",
+    "REQUESTS.md",
+    "PROMPT.md",
+    "MANIFEST.md",
+    "QA.md",
+    "prompts/",
+    "generated/",
+    "source/",
+    "manifests/",
+    "tools/",
+    "qa/",
+    "final/"
+  ],
+  "generation_mode": {
+    "default": "codex",
+    "choices": [
+      "codex",
+      "codex-setup",
+      "gpt-image-2"
+    ]
+  },
+  "note": "This documents the desired prompt-time behavior for SpriteMake agents. Codex must follow AGENTS.md or call this hook; this file alone does not make the Codex runtime execute hooks automatically."
+}
+
+

@@ -1,0 +1,91 @@
+﻿{
+    "batchId":  "horse-lose-poses-2026-05-05",
+    "assetId":  "dinosaur-lose",
+    "vehicleId":  "dinosaur",
+    "state":  "lose",
+    "phase":  1,
+    "status":  "generated-svg-preview-ready-from-base-inline-run-reference",
+    "requiredImageModel":  "gpt-image-2",
+    "targetGameAssetPath":  "assets/horse-race/sprites/lose/dinosaur-lose.png",
+    "localGeneratedPath":  "../generated/dinosaur-lose.svg",
+    "localFinalPath":  "../final/dinosaur-lose.svg",
+    "promptPath":  "../prompts/dinosaur-lose-prompt.md",
+    "qaReportPath":  "../qa/dinosaur-lose-qa.md",
+    "sourceReferences":  [
+                             {
+                                 "path":  "D:/Work/LAMDiceBot/js/horse-race-sprites.js",
+                                 "vehicleDefinitionLine":  1267,
+                                 "state":  "base svgMap run.frame1",
+                                 "note":  "Use the base inline SVG run.frame1 as the mandatory style reference; do not use POWER_VEHICLE_VARIANT_OVERRIDES or booster art."
+                             }
+                         ],
+    "sheets":  {
+                   "dinosaur-lose":  {
+                                         "label":  "dinosaur lose atlas",
+                                         "image":  "../generated/dinosaur-lose.svg",
+                                         "finalImage":  "../final/dinosaur-lose.svg",
+                                         "grid":  {
+                                                      "columns":  2,
+                                                      "rows":  1
+                                                  },
+                                         "canvas":  {
+                                                        "width":  120,
+                                                        "height":  45
+                                                    },
+                                         "cellSize":  {
+                                                          "width":  60,
+                                                          "height":  45
+                                                      },
+                                         "columnBoundaries":  [
+                                                                  0,
+                                                                  60,
+                                                                  120
+                                                              ],
+                                         "rowBoundaries":  [
+                                                               0,
+                                                               45
+                                                           ],
+                                         "anchor":  {
+                                                        "x":  30,
+                                                        "y":  45,
+                                                        "mode":  "pixel",
+                                                        "meaning":  "track ground contact at bottom center"
+                                                    },
+                                         "baselineY":  45,
+                                         "baselineMeaning":  "vehicle feet/bottom contact with track ground; must not drift between frames",
+                                         "defaultScale":  4,
+                                         "rows":  {
+                                                      "0":  "lose pose"
+                                                  },
+                                         "columns":  {
+                                                         "0":  "꼬리 늘어뜨리고 고개 숙임",
+                                                         "1":  "슬픈 호흡으로 머리와 구름이 1px 움직임"
+                                                     },
+                                         "animations":  {
+                                                            "lose":  {
+                                                                         "row":  0,
+                                                                         "frames":  [
+                                                                                        0,
+                                                                                        1
+                                                                                    ],
+                                                                         "fps":  3.3333333333,
+                                                                         "durationMs":  600,
+                                                                         "loop":  true,
+                                                                         "frameMeanings":  [
+                                                                                               "꼬리 늘어뜨리고 고개 숙임",
+                                                                                               "슬픈 호흡으로 머리와 구름이 1px 움직임"
+                                                                                           ]
+                                                                     }
+                                                        },
+                                         "visualDirection":  "초록 공룡(티라노 풍), 짧은 앞발 살짝 들고, 꼬리 땅에 늘어짐, 머리 옆으로 살짝 숙임",
+                                         "qa":  {
+                                                    "alphaBbox":  null,
+                                                    "perCellBbox":  [
+
+                                                                    ],
+                                                    "status":  "pending until generated PNG exists"
+                                                },
+                                         "sourceFormat":  "svg-atlas"
+                                     }
+               }
+}

@@ -1,0 +1,96 @@
+﻿{
+    "batchId":  "horse-lose-poses-2026-05-05",
+    "assetId":  "horse-lose",
+    "vehicleId":  "horse",
+    "state":  "lose",
+    "phase":  1,
+    "status":  "generated-svg-preview-ready-from-base-inline-run-reference",
+    "requiredImageModel":  "gpt-image-2",
+    "targetGameAssetPath":  "assets/horse-race/sprites/lose/horse-lose.png",
+    "localGeneratedPath":  "../generated/horse-lose.svg",
+    "localFinalPath":  "../final/horse-lose.svg",
+    "promptPath":  "../prompts/horse-lose-prompt.md",
+    "qaReportPath":  "../qa/horse-lose-qa.md",
+    "sourceReferences":  [
+                             {
+                                 "path":  "D:/Work/LAMDiceBot/js/horse-race-sprites.js",
+                                 "vehicleDefinitionLine":  463,
+                                 "state":  "base svgMap run.frame1",
+                                 "note":  "Use the base inline SVG run.frame1 as the mandatory style reference; do not use POWER_VEHICLE_VARIANT_OVERRIDES or booster art."
+                             },
+                             {
+                                 "path":  "D:/Work/LAMDiceBot/assets/backgrounds/vehicle-flat/horse.png",
+                                 "copiedTo":  "../source/horse-flat-reference.png",
+                                 "note":  "Reference only; do not treat as output atlas."
+                             }
+                         ],
+    "sheets":  {
+                   "horse-lose":  {
+                                      "label":  "horse lose atlas",
+                                      "image":  "../generated/horse-lose.svg",
+                                      "finalImage":  "../final/horse-lose.svg",
+                                      "grid":  {
+                                                   "columns":  2,
+                                                   "rows":  1
+                                               },
+                                      "canvas":  {
+                                                     "width":  120,
+                                                     "height":  45
+                                                 },
+                                      "cellSize":  {
+                                                       "width":  60,
+                                                       "height":  45
+                                                   },
+                                      "columnBoundaries":  [
+                                                               0,
+                                                               60,
+                                                               120
+                                                           ],
+                                      "rowBoundaries":  [
+                                                            0,
+                                                            45
+                                                        ],
+                                      "anchor":  {
+                                                     "x":  30,
+                                                     "y":  45,
+                                                     "mode":  "pixel",
+                                                     "meaning":  "track ground contact at bottom center"
+                                                 },
+                                      "baselineY":  45,
+                                      "baselineMeaning":  "vehicle feet/bottom contact with track ground; must not drift between frames",
+                                      "defaultScale":  4,
+                                      "rows":  {
+                                                   "0":  "lose pose"
+                                               },
+                                      "columns":  {
+                                                      "0":  "무릎 꿇음 + 고개 숙임",
+                                                      "1":  "한숨 구름이 살짝 움직이고 몸이 1px 들썩임"
+                                                  },
+                                      "animations":  {
+                                                         "lose":  {
+                                                                      "row":  0,
+                                                                      "frames":  [
+                                                                                     0,
+                                                                                     1
+                                                                                 ],
+                                                                      "fps":  3.3333333333,
+                                                                      "durationMs":  600,
+                                                                      "loop":  true,
+                                                                      "frameMeanings":  [
+                                                                                            "무릎 꿇음 + 고개 숙임",
+                                                                                            "한숨 구름이 살짝 움직이고 몸이 1px 들썩임"
+                                                                                        ]
+                                                                  }
+                                                     },
+                                      "visualDirection":  "갈색/베이지 말, 갈기 헝클어짐, 눈은 ㅠㅠ 모양",
+                                      "qa":  {
+                                                 "alphaBbox":  null,
+                                                 "perCellBbox":  [
+
+                                                                 ],
+                                                 "status":  "pending until generated PNG exists"
+                                             },
+                                      "sourceFormat":  "svg-atlas"
+                                  }
+               }
+}

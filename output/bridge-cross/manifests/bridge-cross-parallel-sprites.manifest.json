@@ -1,0 +1,594 @@
+{
+  "version": 2,
+  "feature": "bridge-cross-parallel-run",
+  "notes": "SpriteMake preview manifest for requested parallel-run sprite additions. Image files are expected under ../generated until QA passes.",
+  "sheets": {
+    "playersMyOutline": {
+      "label": "Bridge Cross My Character Outline V1",
+      "image": "../final/players-my-outline-v1.png",
+      "targetGameImage": "assets/bridge-cross/sprites/players-my-outline-v1.png",
+      "grid": {
+        "columns": 4,
+        "rows": 7
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.88,
+        "mode": "normalized"
+      },
+      "baselineY": 165,
+      "defaultScale": 0.58,
+      "animations": {
+        "idle": {
+          "row": 0,
+          "frames": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "fps": 5,
+          "loop": true
+        },
+        "walk": {
+          "row": 6,
+          "frames": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "fps": 5,
+          "loop": true
+        },
+        "run": {
+          "row": 1,
+          "frames": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "fps": 8,
+          "loop": true
+        },
+        "jump": {
+          "row": 2,
+          "frames": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "fps": 7,
+          "loop": false
+        },
+        "land": {
+          "row": 3,
+          "frames": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "fps": 8,
+          "loop": false
+        },
+        "fall": {
+          "row": 4,
+          "frames": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "fps": 7,
+          "loop": false
+        },
+        "result": {
+          "row": 5,
+          "frames": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "fps": 5,
+          "loop": true
+        }
+      }
+    },
+    "playersOutline": {
+      "label": "Bridge Cross Player Outline Overlay V1",
+      "image": "../final/players-outline-v1.png",
+      "targetGameImage": "assets/bridge-cross/sprites/players-outline-v1.png",
+      "grid": {
+        "columns": 4,
+        "rows": 7
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.88,
+        "mode": "normalized"
+      },
+      "baselineY": 165,
+      "defaultScale": 0.58,
+      "animations": {
+        "idle": {
+          "row": 0,
+          "frames": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "fps": 5,
+          "loop": true
+        },
+        "walk": {
+          "row": 6,
+          "frames": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "fps": 5,
+          "loop": true
+        },
+        "run": {
+          "row": 1,
+          "frames": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "fps": 8,
+          "loop": true
+        },
+        "jump": {
+          "row": 2,
+          "frames": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "fps": 7,
+          "loop": false
+        },
+        "land": {
+          "row": 3,
+          "frames": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "fps": 8,
+          "loop": false
+        },
+        "fall": {
+          "row": 4,
+          "frames": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "fps": 7,
+          "loop": false
+        },
+        "result": {
+          "row": 5,
+          "frames": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "fps": 5,
+          "loop": true
+        }
+      }
+    },
+    "finishLotteryObject": {
+      "label": "Bridge Cross Finish Lottery Object V1",
+      "image": "../generated/finish-lottery-object-v1.png",
+      "targetGameImage": "assets/bridge-cross/sprites/finish-lottery-object-v1.png",
+      "grid": {
+        "columns": 4,
+        "rows": 6
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.88,
+        "mode": "normalized"
+      },
+      "baselineY": 165,
+      "defaultScale": 0.72,
+      "animations": {
+        "idle_closed": {
+          "row": 0,
+          "frames": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "fps": 5,
+          "loop": true
+        },
+        "gather_prompt": {
+          "row": 1,
+          "frames": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "fps": 7,
+          "loop": true
+        },
+        "mix_shake": {
+          "row": 2,
+          "frames": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "fps": 10,
+          "loop": true
+        },
+        "draw_lot": {
+          "row": 3,
+          "frames": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "fps": 8,
+          "loop": false
+        },
+        "reveal_lot": {
+          "row": 4,
+          "frames": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "fps": 8,
+          "loop": false
+        },
+        "reset_settle": {
+          "row": 5,
+          "frames": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "fps": 6,
+          "loop": false
+        }
+      }
+    },
+    "glassFxV3": {
+      "label": "Bridge Cross Glass FX Parallel V3",
+      "image": "../generated/glass-fx-v3.png",
+      "targetGameImage": "assets/bridge-cross/sprites/glass-fx-v3.png",
+      "grid": {
+        "columns": 4,
+        "rows": 11
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.88,
+        "mode": "normalized"
+      },
+      "baselineY": 165,
+      "defaultScale": 0.72,
+      "animations": {
+        "safe_sparkle": {
+          "row": 0,
+          "frames": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "fps": 7,
+          "loop": true
+        },
+        "warning_glow": {
+          "row": 1,
+          "frames": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "fps": 7,
+          "loop": true
+        },
+        "crack": {
+          "row": 2,
+          "frames": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "fps": 8,
+          "loop": false
+        },
+        "break_shards": {
+          "row": 3,
+          "frames": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "fps": 7,
+          "loop": false
+        },
+        "fall_trail": {
+          "row": 4,
+          "frames": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "fps": 8,
+          "loop": true
+        },
+        "landing_pulse": {
+          "row": 5,
+          "frames": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "fps": 8,
+          "loop": false
+        },
+        "restore_glass": {
+          "row": 6,
+          "frames": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "fps": 8,
+          "loop": false
+        },
+        "shared_tile_pressure": {
+          "row": 7,
+          "frames": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "fps": 8,
+          "loop": true
+        },
+        "cascade_break_burst": {
+          "row": 8,
+          "frames": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "fps": 10,
+          "loop": false
+        },
+        "start_dash_dust": {
+          "row": 9,
+          "frames": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "fps": 10,
+          "loop": false
+        },
+        "finish_arrival_glow": {
+          "row": 10,
+          "frames": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "fps": 8,
+          "loop": false
+        }
+      }
+    },
+    "playersParallelRefresh": {
+      "label": "Bridge Cross Player Parallel Readability Refresh",
+      "image": "../generated/players-blue-parallel-v3.png",
+      "targetGameImagePattern": "assets/bridge-cross/sprites/players-{color}.png",
+      "grid": {
+        "columns": 4,
+        "rows": 7
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.88,
+        "mode": "normalized"
+      },
+      "baselineY": 165,
+      "defaultScale": 0.58,
+      "paletteOrder": [
+        "red",
+        "orange",
+        "yellow",
+        "green",
+        "blue",
+        "indigo",
+        "violet"
+      ],
+      "paletteImages": {
+        "red": "../generated/players-red-parallel-v3.png",
+        "orange": "../generated/players-orange-parallel-v3.png",
+        "yellow": "../generated/players-yellow-parallel-v3.png",
+        "green": "../generated/players-green-parallel-v3.png",
+        "blue": "../generated/players-blue-parallel-v3.png",
+        "indigo": "../generated/players-indigo-parallel-v3.png",
+        "violet": "../generated/players-violet-parallel-v3.png"
+      },
+      "animations": {
+        "idle": {
+          "row": 0,
+          "frames": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "fps": 5,
+          "loop": true
+        },
+        "walk": {
+          "row": 6,
+          "frames": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "fps": 5,
+          "loop": true
+        },
+        "run": {
+          "row": 1,
+          "frames": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "fps": 8,
+          "loop": true
+        },
+        "jump": {
+          "row": 2,
+          "frames": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "fps": 7,
+          "loop": false
+        },
+        "land": {
+          "row": 3,
+          "frames": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "fps": 8,
+          "loop": false
+        },
+        "fall": {
+          "row": 4,
+          "frames": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "fps": 7,
+          "loop": false
+        },
+        "result": {
+          "row": 5,
+          "frames": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "fps": 5,
+          "loop": true
+        }
+      }
+    },
+    "bonusPad": {
+      "label": "Bridge Cross Bonus Jump Pad V1",
+      "image": "../final/bonus-pad-v1.png",
+      "targetGameImage": "assets/bridge-cross/sprites/bonus-pad-v1.png",
+      "grid": {
+        "columns": 4,
+        "rows": 1
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1,
+        "mode": "normalized"
+      },
+      "baselineY": 256,
+      "defaultScale": 0.8,
+      "animations": {
+        "spawn": {
+          "row": 0,
+          "frames": [
+            0
+          ],
+          "fps": 1,
+          "loop": false
+        },
+        "ready": {
+          "row": 0,
+          "frames": [
+            1
+          ],
+          "fps": 1,
+          "loop": false
+        },
+        "compress": {
+          "row": 0,
+          "frames": [
+            2
+          ],
+          "fps": 1,
+          "loop": false
+        },
+        "launch": {
+          "row": 0,
+          "frames": [
+            3
+          ],
+          "fps": 1,
+          "loop": false
+        },
+        "full": {
+          "row": 0,
+          "frames": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "fps": 14,
+          "loop": false
+        }
+      }
+    }
+  }
+}

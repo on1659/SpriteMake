@@ -1,0 +1,23 @@
+# Local browser and verification captures
+.playwright-cli/
+
+# Dependency and runtime caches
+node_modules/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# Local environment and secrets
+.env
+.env.*
+*.local
+
+# Editor and OS noise
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

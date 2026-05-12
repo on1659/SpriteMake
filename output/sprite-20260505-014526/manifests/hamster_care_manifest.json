@@ -1,0 +1,86 @@
+{
+  "sheets": {
+    "hamster_care_atlas": {
+      "label": "Hamster Care Character Atlas",
+      "image": "../generated/hamster_care_atlas.png",
+      "grid": {
+        "columns": 4,
+        "rows": 4
+      },
+      "anchor": {
+        "x": 128,
+        "y": 220,
+        "mode": "pixel"
+      },
+      "baselineY": 220,
+      "defaultScale": 1,
+      "animations": {
+        "idle_breathe": {
+          "row": 0,
+          "frames": [0, 1, 2, 3],
+          "fps": 6,
+          "loop": true
+        },
+        "walk": {
+          "row": 1,
+          "frames": [0, 1, 2, 3],
+          "fps": 8,
+          "loop": true
+        },
+        "eat": {
+          "row": 2,
+          "frames": [0, 1, 2, 3],
+          "fps": 7,
+          "loop": true
+        },
+        "sleep": {
+          "row": 3,
+          "frames": [0, 1, 2, 3],
+          "fps": 4,
+          "loop": true
+        }
+      }
+    },
+    "hamster_care_items": {
+      "label": "Hamster Care Item Atlas",
+      "image": "../generated/hamster_care_items.png",
+      "grid": {
+        "columns": 4,
+        "rows": 1
+      },
+      "anchor": {
+        "x": 128,
+        "y": 220,
+        "mode": "pixel"
+      },
+      "baselineY": 220,
+      "defaultScale": 1,
+      "animations": {
+        "food_bowl": {
+          "row": 0,
+          "frames": [0],
+          "fps": 1,
+          "loop": false
+        },
+        "water_bottle": {
+          "row": 0,
+          "frames": [1],
+          "fps": 1,
+          "loop": false
+        },
+        "exercise_wheel": {
+          "row": 0,
+          "frames": [2],
+          "fps": 1,
+          "loop": false
+        },
+        "bed": {
+          "row": 0,
+          "frames": [3],
+          "fps": 1,
+          "loop": false
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,3 @@
+﻿url=http://127.0.0.1:8766/index.html
+pid=4668
+root=D:\Work\vibe\SpriteMake\output\sprite-20260505-014526\game

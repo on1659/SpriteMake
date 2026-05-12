@@ -1,0 +1,714 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <title>Horse Lose Batch Preview</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #090b10;
+      --surface: #141820;
+      --surface-2: #1d2530;
+      --line: #33404f;
+      --line-strong: #5e7389;
+      --text: #eef4fa;
+      --muted: #9aa8b6;
+      --cyan: #61d6ee;
+      --gold: #f1c15b;
+      --green: #78d48b;
+      --red: #ef7a7a;
+      --blue: #8cb9ff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      padding: 14px;
+    }
+
+    .shell {
+      width: min(1480px, 100%);
+      margin: 0 auto;
+      display: grid;
+      gap: 12px;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: minmax(260px, 1fr) auto;
+      gap: 14px;
+      align-items: end;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-end;
+      align-items: end;
+    }
+
+    label {
+      display: grid;
+      gap: 5px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    button,
+    select,
+    input {
+      min-height: 36px;
+      border: 1px solid var(--line-strong);
+      border-radius: 7px;
+      background: var(--surface-2);
+      color: var(--text);
+      font: inherit;
+    }
+
+    button {
+      padding: 7px 12px;
+      cursor: pointer;
+    }
+
+    select {
+      padding: 6px 28px 6px 9px;
+    }
+
+    input[type="range"] {
+      width: 136px;
+      accent-color: var(--cyan);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .stat {
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 18px;
+      color: var(--text);
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .phase {
+      display: grid;
+      gap: 8px;
+    }
+
+    .phase h2 {
+      margin: 0;
+      font-size: 15px;
+      color: var(--gold);
+      letter-spacing: 0;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 10px;
+    }
+
+    .asset {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      overflow: hidden;
+    }
+
+    .asset-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+      padding: 9px 10px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .name {
+      min-width: 0;
+      font-weight: 900;
+      font-size: 14px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .meta {
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 11px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .badge {
+      min-width: 62px;
+      text-align: center;
+      padding: 4px 7px;
+      border: 1px solid var(--line-strong);
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .badge.ok {
+      color: var(--green);
+      border-color: rgba(120, 212, 139, 0.7);
+    }
+
+    .badge.bad {
+      color: var(--red);
+      border-color: rgba(239, 122, 122, 0.75);
+    }
+
+    .badge.warn {
+      color: var(--gold);
+      border-color: rgba(241, 193, 91, 0.75);
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      background:
+        linear-gradient(45deg, #10151c 25%, transparent 25%),
+        linear-gradient(-45deg, #10151c 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #10151c 75%),
+        linear-gradient(-45deg, transparent 75%, #10151c 75%);
+      background-size: 18px 18px;
+      background-position: 0 0, 0 9px, 9px -9px, -9px 0;
+      image-rendering: pixelated;
+    }
+
+    .asset-foot {
+      display: grid;
+      gap: 4px;
+      padding: 8px 10px 10px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 11px;
+      line-height: 1.45;
+    }
+
+    .path {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: var(--blue);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 760px) {
+      header {
+        grid-template-columns: 1fr;
+      }
+
+      .controls {
+        justify-content: start;
+      }
+
+      .stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div>
+        <h1>Horse Lose Batch Preview</h1>
+        <p class="subtitle">15종 lose atlas 동시 재생</p>
+      </div>
+      <div class="controls">
+        <label>
+          Source
+          <select id="sourceSelect">
+            <option value="auto" selected>auto</option>
+            <option value="generated">generated</option>
+            <option value="final">final</option>
+            <option value="game">game target</option>
+          </select>
+        </label>
+        <label>
+          Phase
+          <select id="phaseSelect">
+            <option value="all">all</option>
+            <option value="1">phase 1</option>
+            <option value="2">phase 2</option>
+            <option value="3">phase 3</option>
+          </select>
+        </label>
+        <label>
+          Scale <span id="scaleValue">3x</span>
+          <input id="scaleRange" type="range" min="2" max="5" step="0.5" value="3">
+        </label>
+        <button id="playBtn" type="button">Pause</button>
+        <button id="reloadBtn" type="button">Reload</button>
+      </div>
+    </header>
+
+    <section class="stats">
+      <div class="stat"><strong id="loadedCount">0</strong><span>loaded</span></div>
+      <div class="stat"><strong id="missingCount">15</strong><span>missing</span></div>
+      <div class="stat"><strong id="badSizeCount">0</strong><span>size issue</span></div>
+      <div class="stat"><strong id="frameLabel">frame 1</strong><span>0.6s loop</span></div>
+    </section>
+
+    <section class="phase" data-phase-block="1">
+      <h2>Phase 1</h2>
+      <div class="grid" id="phase1"></div>
+    </section>
+
+    <section class="phase" data-phase-block="2">
+      <h2>Phase 2</h2>
+      <div class="grid" id="phase2"></div>
+    </section>
+
+    <section class="phase" data-phase-block="3">
+      <h2>Phase 3</h2>
+      <div class="grid" id="phase3"></div>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const ASSETS = [
+        { id: "horse", label: "horse / 말", phase: 1, pose: "kneel", note: "knee down, sad cloud" },
+        { id: "rabbit", label: "rabbit / 토끼", phase: 1, pose: "sit", note: "drooped ears, tear" },
+        { id: "turtle", label: "turtle / 거북이", phase: 1, pose: "hide", note: "half inside shell" },
+        { id: "dinosaur", label: "dinosaur / 공룡", phase: 1, pose: "low", note: "tail down, head low" },
+        { id: "knight", label: "knight / 기사", phase: 1, pose: "kneel", note: "sword on ground" },
+        { id: "car", label: "car / 자동차", phase: 2, pose: "tilt", note: "stopped, hood cloud" },
+        { id: "rocket", label: "rocket / 로켓", phase: 2, pose: "tilt", note: "no thrust, gray smoke" },
+        { id: "bird", label: "bird / 새", phase: 2, pose: "droop", note: "folded wings, feather" },
+        { id: "ninja", label: "ninja / 닌자", phase: 2, pose: "kneel", note: "reversed sword" },
+        { id: "boat", label: "boat / 배", phase: 3, pose: "tilt", note: "sinking, bubbles" },
+        { id: "bicycle", label: "bicycle / 자전거", phase: 3, pose: "tilt", note: "rider sigh" },
+        { id: "scooter", label: "scooter / 스쿠터", phase: 3, pose: "stop", note: "helmet tear" },
+        { id: "helicopter", label: "helicopter / 헬리콥터", phase: 3, pose: "tilt", note: "propeller stopped" },
+        { id: "eagle", label: "eagle / 독수리", phase: 3, pose: "droop", note: "folded wings" },
+        { id: "crab", label: "crab / 게", phase: 3, pose: "sit", note: "claws down, bubbles" }
+      ];
+
+      const EXPECTED = {
+        width: 120,
+        height: 45,
+        cols: 2,
+        rows: 1,
+        cellW: 60,
+        cellH: 45,
+        anchorX: 30,
+        anchorY: 45,
+        fps: 3.3333333333
+      };
+
+      const els = {
+        sourceSelect: document.getElementById("sourceSelect"),
+        phaseSelect: document.getElementById("phaseSelect"),
+        scaleRange: document.getElementById("scaleRange"),
+        scaleValue: document.getElementById("scaleValue"),
+        playBtn: document.getElementById("playBtn"),
+        reloadBtn: document.getElementById("reloadBtn"),
+        loadedCount: document.getElementById("loadedCount"),
+        missingCount: document.getElementById("missingCount"),
+        badSizeCount: document.getElementById("badSizeCount"),
+        frameLabel: document.getElementById("frameLabel")
+      };
+
+      const state = {
+        cards: new Map(),
+        playing: true,
+        frame: 0,
+        accumulator: 0,
+        lastTime: performance.now(),
+        scale: Number(document.getElementById("scaleRange").value)
+      };
+
+      function assetName(asset) {
+        return `${asset.id}-lose`;
+      }
+
+      function imagePath(asset) {
+        const fileName = `${assetName(asset)}.png`;
+        const root = els.sourceSelect.value === "final" ? "../final"
+          : els.sourceSelect.value === "game" ? "file:///D:/Work/LAMDiceBot/assets/horse-race/sprites/lose"
+          : "../generated";
+        return `${root}/${fileName}`;
+      }
+
+      function imageCandidates(asset) {
+        const pngName = `${assetName(asset)}.png`;
+        const svgName = `${assetName(asset)}.svg`;
+        if (els.sourceSelect.value === "auto") {
+          return [
+            `../final/${pngName}`,
+            `../generated/${pngName}`,
+            `../final/${svgName}`,
+            `../generated/${svgName}`,
+            `file:///D:/Work/LAMDiceBot/assets/horse-race/sprites/lose/${pngName}`,
+            `file:///D:/Work/LAMDiceBot/assets/horse-race/sprites/lose/${svgName}`
+          ];
+        }
+        if (els.sourceSelect.value === "final") return [`../final/${pngName}`, `../final/${svgName}`];
+        if (els.sourceSelect.value === "generated") return [`../generated/${pngName}`, `../generated/${svgName}`];
+        if (els.sourceSelect.value === "game") {
+          return [
+            `file:///D:/Work/LAMDiceBot/assets/horse-race/sprites/lose/${pngName}`,
+            `file:///D:/Work/LAMDiceBot/assets/horse-race/sprites/lose/${svgName}`
+          ];
+        }
+        return [imagePath(asset)];
+      }
+
+      function cardTemplate(asset) {
+        const article = document.createElement("article");
+        article.className = "asset";
+        article.dataset.phase = String(asset.phase);
+        article.innerHTML = `
+          <div class="asset-head">
+            <div>
+              <div class="name">${asset.label}</div>
+              <div class="meta">phase ${asset.phase} · ${asset.pose} · ${asset.note}</div>
+            </div>
+            <div class="badge warn" data-role="status">pending</div>
+          </div>
+          <canvas width="360" height="230" data-role="canvas"></canvas>
+          <div class="asset-foot">
+            <div data-role="size">size: pending</div>
+            <div data-role="bbox">bbox: pending</div>
+            <div class="path" data-role="path"></div>
+          </div>
+        `;
+        return article;
+      }
+
+      function build() {
+        ASSETS.forEach((asset) => {
+          const node = cardTemplate(asset);
+          document.getElementById(`phase${asset.phase}`).appendChild(node);
+        state.cards.set(asset.id, {
+            asset,
+            node,
+            canvas: node.querySelector("[data-role='canvas']"),
+            status: node.querySelector("[data-role='status']"),
+            size: node.querySelector("[data-role='size']"),
+            bbox: node.querySelector("[data-role='bbox']"),
+            path: node.querySelector("[data-role='path']"),
+            img: null,
+            loaded: false,
+            badSize: false,
+            bboxText: "bbox: pending",
+            attempts: []
+          });
+        });
+      }
+
+      function transparentBbox(img, sx, sy, sw, sh) {
+        const scratch = document.createElement("canvas");
+        scratch.width = sw;
+        scratch.height = sh;
+        const ctx = scratch.getContext("2d", { willReadFrequently: true });
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh);
+        const data = ctx.getImageData(0, 0, sw, sh).data;
+        let minX = sw;
+        let minY = sh;
+        let maxX = -1;
+        let maxY = -1;
+        for (let y = 0; y < sh; y += 1) {
+          for (let x = 0; x < sw; x += 1) {
+            if (data[(y * sw + x) * 4 + 3] > 0) {
+              minX = Math.min(minX, x);
+              minY = Math.min(minY, y);
+              maxX = Math.max(maxX, x);
+              maxY = Math.max(maxY, y);
+            }
+          }
+        }
+        if (maxX < 0) return null;
+        return { x: minX, y: minY, w: maxX - minX + 1, h: maxY - minY + 1, bottom: maxY + 1 };
+      }
+
+      function bboxLabel(box) {
+        if (!box) return "empty";
+        return `${box.x},${box.y},${box.w},${box.h},b${box.bottom}`;
+      }
+
+      function measure(card) {
+        const img = card.img;
+        const full = transparentBbox(img, 0, 0, img.naturalWidth, img.naturalHeight);
+        const c0 = transparentBbox(img, 0, 0, EXPECTED.cellW, EXPECTED.cellH);
+        const c1 = transparentBbox(img, EXPECTED.cellW, 0, EXPECTED.cellW, EXPECTED.cellH);
+        card.bboxText = `bbox: full ${bboxLabel(full)} · c0 ${bboxLabel(c0)} · c1 ${bboxLabel(c1)}`;
+      }
+
+      function loadOne(card) {
+        card.loaded = false;
+        card.badSize = false;
+        card.attempts = imageCandidates(card.asset);
+        card.path.textContent = card.attempts.join(" -> ");
+        loadCandidate(card, 0);
+      }
+
+      function loadCandidate(card, index) {
+        const path = card.attempts[index];
+        if (!path) {
+          card.loaded = false;
+          card.status.textContent = "missing";
+          card.status.className = "badge warn";
+          card.size.textContent = "size: no image found";
+          card.bbox.textContent = "bbox: pending";
+          card.path.textContent = `${card.attempts.join(" -> ")} | put ${assetName(card.asset)}.png or .svg in generated/ or final/`;
+          updateStats();
+          drawCard(card);
+          return;
+        }
+        const img = new Image();
+        img.decoding = "async";
+        img.onload = () => {
+          card.img = img;
+          card.loaded = true;
+          card.badSize = card.img.naturalWidth !== EXPECTED.width || card.img.naturalHeight !== EXPECTED.height;
+          card.status.textContent = card.badSize ? "size" : "ok";
+          card.status.className = `badge ${card.badSize ? "bad" : "ok"}`;
+          card.size.textContent = `size: ${card.img.naturalWidth}x${card.img.naturalHeight} / expected 120x45`;
+          card.path.textContent = path;
+          try {
+            measure(card);
+          } catch (error) {
+            card.bboxText = `bbox: ${error.message}`;
+          }
+          card.bbox.textContent = card.bboxText;
+          updateStats();
+          drawCard(card);
+        };
+        img.onerror = () => {
+          loadCandidate(card, index + 1);
+        };
+        img.src = `${path}?v=${Date.now()}`;
+      }
+
+      function loadAll() {
+        state.cards.forEach(loadOne);
+      }
+
+      function clear(ctx, width, height) {
+        ctx.clearRect(0, 0, width, height);
+        ctx.fillStyle = "#0c1016";
+        ctx.fillRect(0, 0, width, height);
+      }
+
+      function drawMissing(card, ctx, width, height) {
+        ctx.fillStyle = "#1d2530";
+        ctx.fillRect(16, 24, width - 32, height - 48);
+        ctx.strokeStyle = "#5e7389";
+        ctx.strokeRect(16.5, 24.5, width - 33, height - 49);
+        ctx.fillStyle = "#9aa8b6";
+        ctx.font = "700 14px ui-sans-serif, system-ui";
+        ctx.textAlign = "center";
+        ctx.fillText(`${assetName(card.asset)}.png / .svg`, width / 2, height / 2 - 8);
+        ctx.fillStyle = "#f1c15b";
+        ctx.fillText("이미지 없음: generated/ 또는 final/에 png/svg 넣기", width / 2, height / 2 + 14);
+      }
+
+      function drawFrameGuides(ctx, dx, dy, scale) {
+        const baseline = dy + EXPECTED.anchorY * scale;
+        const anchorX = dx + EXPECTED.anchorX * scale;
+        ctx.strokeStyle = "rgba(241, 193, 91, 0.95)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(dx, baseline + 0.5);
+        ctx.lineTo(dx + EXPECTED.cellW * scale, baseline + 0.5);
+        ctx.stroke();
+        ctx.fillStyle = "#61d6ee";
+        ctx.fillRect(Math.round(anchorX) - 2, Math.round(baseline) - 2, 5, 5);
+      }
+
+      function drawSheetGuides(ctx, x, y, scale, frame) {
+        const w = EXPECTED.width * scale;
+        const h = EXPECTED.height * scale;
+        ctx.strokeStyle = "rgba(94, 115, 137, 0.95)";
+        ctx.lineWidth = 1;
+        ctx.strokeRect(x + 0.5, y + 0.5, w, h);
+        ctx.beginPath();
+        ctx.moveTo(x + EXPECTED.cellW * scale + 0.5, y);
+        ctx.lineTo(x + EXPECTED.cellW * scale + 0.5, y + h);
+        ctx.stroke();
+        ctx.strokeStyle = "rgba(241, 193, 91, 0.95)";
+        ctx.beginPath();
+        ctx.moveTo(x, y + EXPECTED.anchorY * scale + 0.5);
+        ctx.lineTo(x + w, y + EXPECTED.anchorY * scale + 0.5);
+        ctx.stroke();
+        ctx.strokeStyle = "rgba(97, 214, 238, 0.95)";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(x + frame * EXPECTED.cellW * scale + 1, y + 1, EXPECTED.cellW * scale - 2, h - 2);
+      }
+
+      function drawCard(card) {
+        const canvas = card.canvas;
+        const ctx = canvas.getContext("2d");
+        ctx.imageSmoothingEnabled = false;
+        const width = canvas.width;
+        const height = canvas.height;
+        clear(ctx, width, height);
+
+        if (!card.loaded) {
+          drawMissing(card, ctx, width, height);
+          return;
+        }
+
+        const frame = state.frame;
+        const scale = state.scale;
+        const frameW = EXPECTED.cellW * scale;
+        const frameH = EXPECTED.cellH * scale;
+        const dx = Math.round((width - frameW) / 2);
+        const dy = 20;
+
+        ctx.drawImage(
+          card.img,
+          frame * EXPECTED.cellW,
+          0,
+          EXPECTED.cellW,
+          EXPECTED.cellH,
+          dx,
+          dy,
+          frameW,
+          frameH
+        );
+        drawFrameGuides(ctx, dx, dy, scale);
+
+        const sheetScale = Math.min(2, (width - 36) / EXPECTED.width);
+        const sheetW = EXPECTED.width * sheetScale;
+        const sheetH = EXPECTED.height * sheetScale;
+        const sheetX = Math.round((width - sheetW) / 2);
+        const sheetY = height - sheetH - 18;
+        ctx.drawImage(card.img, sheetX, sheetY, sheetW, sheetH);
+        drawSheetGuides(ctx, sheetX, sheetY, sheetScale, frame);
+
+        ctx.fillStyle = card.badSize ? "#ef7a7a" : "#78d48b";
+        ctx.font = "800 12px ui-sans-serif, system-ui";
+        ctx.textAlign = "left";
+        ctx.fillText(card.badSize ? "size mismatch" : "120x45 ok", 14, 16);
+      }
+
+      function drawAll() {
+        state.cards.forEach(drawCard);
+      }
+
+      function updateStats() {
+        const cards = Array.from(state.cards.values());
+        const loaded = cards.filter((card) => card.loaded).length;
+        const badSize = cards.filter((card) => card.badSize).length;
+        els.loadedCount.textContent = String(loaded);
+        els.missingCount.textContent = String(cards.length - loaded);
+        els.badSizeCount.textContent = String(badSize);
+        els.frameLabel.textContent = `frame ${state.frame + 1}`;
+      }
+
+      function applyFilter() {
+        const selected = els.phaseSelect.value;
+        document.querySelectorAll("[data-phase-block]").forEach((block) => {
+          block.classList.toggle("hidden", selected !== "all" && block.dataset.phaseBlock !== selected);
+        });
+      }
+
+      function tick(now) {
+        const dt = Math.min(100, now - state.lastTime);
+        state.lastTime = now;
+        if (state.playing) {
+          state.accumulator += dt;
+          const frameMs = 1000 / EXPECTED.fps;
+          while (state.accumulator >= frameMs) {
+            state.accumulator -= frameMs;
+            state.frame = state.frame ? 0 : 1;
+            updateStats();
+            drawAll();
+          }
+        }
+        requestAnimationFrame(tick);
+      }
+
+      els.sourceSelect.addEventListener("change", loadAll);
+      els.phaseSelect.addEventListener("change", applyFilter);
+      els.scaleRange.addEventListener("input", () => {
+        state.scale = Number(els.scaleRange.value);
+        els.scaleValue.textContent = `${state.scale}x`;
+        drawAll();
+      });
+      els.playBtn.addEventListener("click", () => {
+        state.playing = !state.playing;
+        els.playBtn.textContent = state.playing ? "Pause" : "Play";
+      });
+      els.reloadBtn.addEventListener("click", loadAll);
+
+      window.render_game_to_text = () => JSON.stringify({
+        ready: true,
+        source: els.sourceSelect.value,
+        frame: state.frame,
+        loaded: Number(els.loadedCount.textContent),
+        missing: Number(els.missingCount.textContent),
+        badSize: Number(els.badSizeCount.textContent)
+      });
+
+      build();
+      els.sourceSelect.value = "auto";
+      applyFilter();
+      loadAll();
+      requestAnimationFrame(tick);
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,958 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lettuce Raid Play Mockup</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #22cdd0;
+      --panel: #ffffff;
+      --ink: #17231b;
+      --muted: #66736a;
+      --line: rgba(31, 48, 35, 0.18);
+      --accent: #f0b400;
+      --green: #35a84c;
+      --danger: #e04f3f;
+      --violet: #8d64e8;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      display: grid;
+      place-items: start center;
+      padding: 18px 12px;
+    }
+
+    .shell {
+      width: min(670px, 100%);
+      display: grid;
+      gap: 10px;
+    }
+
+    .toolbar,
+    .game-card,
+    .chat-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: 0 18px 40px rgba(13, 74, 76, 0.14);
+    }
+
+    .toolbar {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+    }
+
+    .top-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    .sub {
+      margin: 3px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .metric {
+      min-height: 48px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      padding: 7px 8px;
+      background: #f7fbf5;
+    }
+
+    .metric b {
+      display: block;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0;
+    }
+
+    .metric span {
+      display: block;
+      margin-top: 3px;
+      font-size: 17px;
+      font-weight: 900;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    button {
+      min-height: 34px;
+      border: 1px solid rgba(31, 48, 35, 0.18);
+      border-radius: 7px;
+      padding: 7px 11px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      font-size: 12px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    button.primary {
+      border-color: rgba(181, 135, 0, 0.34);
+      background: linear-gradient(180deg, #ffe27a, #f4b500);
+    }
+
+    button.violet {
+      border-color: rgba(100, 69, 190, 0.22);
+      background: linear-gradient(180deg, #a987ff, #815adf);
+      color: #fff;
+    }
+
+    .game-card {
+      overflow: hidden;
+      background: #0f1812;
+    }
+
+    .canvas-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 3 / 2;
+      background: #1e2a18;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      image-rendering: auto;
+      touch-action: none;
+    }
+
+    .zoom {
+      position: absolute;
+      right: 14px;
+      bottom: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 36px;
+      padding: 5px;
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      border-radius: 8px;
+      background: rgba(14, 20, 18, 0.72);
+      color: #eafff0;
+      font-size: 12px;
+      font-weight: 900;
+      backdrop-filter: blur(8px);
+    }
+
+    .zoom button {
+      width: 28px;
+      min-height: 26px;
+      padding: 0;
+      border-color: rgba(255, 255, 255, 0.22);
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+    }
+
+    .chat-card {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+    }
+
+    .chat-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 13px;
+      font-weight: 900;
+      color: #0092b1;
+    }
+
+    .log {
+      min-height: 42px;
+      max-height: 72px;
+      overflow: hidden;
+      border-radius: 8px;
+      background: #f7fbf7;
+      color: var(--muted);
+      padding: 8px 10px;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .input-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+    }
+
+    input {
+      min-height: 40px;
+      border: 1px solid rgba(31, 48, 35, 0.2);
+      border-radius: 7px;
+      padding: 8px 10px;
+      font: inherit;
+      font-size: 13px;
+    }
+
+    @media (max-width: 560px) {
+      body {
+        padding: 10px 8px;
+      }
+
+      .top-row,
+      .input-row {
+        grid-template-columns: 1fr;
+      }
+
+      .actions {
+        justify-content: stretch;
+      }
+
+      .actions button,
+      .input-row button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="toolbar">
+      <div class="top-row">
+        <div>
+          <h1>Lettuce Raid</h1>
+          <p class="sub">배경/캐릭터 리소스 결합용 1차 플레이 목업</p>
+        </div>
+        <div class="actions">
+          <button id="startBtn" class="primary" type="button">시작</button>
+          <button id="pauseBtn" type="button">일시정지</button>
+          <button id="resetBtn" class="violet" type="button">리셋</button>
+        </div>
+      </div>
+      <div class="metrics">
+        <div class="metric"><b>상추</b><span id="lettuceMetric">0/0</span></div>
+        <div class="metric"><b>경계</b><span id="alertMetric">0%</span></div>
+        <div class="metric"><b>결과</b><span id="resultMetric">대기</span></div>
+      </div>
+    </section>
+
+    <section class="game-card">
+      <div class="canvas-wrap">
+        <canvas id="game" width="960" height="640" aria-label="Lettuce Raid mockup canvas"></canvas>
+        <div class="zoom">
+          <button id="zoomOutBtn" type="button" aria-label="zoom out">-</button>
+          <span id="zoomLabel">1.0x</span>
+          <button id="zoomInBtn" type="button" aria-label="zoom in">+</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="chat-card">
+      <div class="chat-head">
+        <span>채팅</span>
+        <button id="helpBtn" type="button">힌트</button>
+      </div>
+      <div id="log" class="log">게임 대기 중... 시작을 누르면 아이들이 몰래 움직여요.</div>
+      <div class="input-row">
+        <input id="chatInput" type="text" placeholder="메시지를 입력하세요..." autocomplete="off">
+        <button id="sendBtn" type="button">전송</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+
+    const assets = {
+      bg: loadImage("../stage/stage-background-v1.png"),
+      players: loadImage("../characters/players-atlas-v3.png"),
+      owner: loadImage("../characters/owner-atlas-v1.png")
+    };
+
+    const playerCell = { w: 384, h: 288 };
+    const ownerCell = { w: 512, h: 512 };
+    const poses = { idle: 0, sneak: 1, steal: 2, stunned: 3 };
+    const ownerPoses = {
+      idle: [0, 0],
+      notice: [1, 0],
+      chase: [2, 0],
+      swing: [0, 1],
+      angry: [1, 1],
+      victory: [2, 1]
+    };
+    const playerColors = {
+      red: "#df3f36",
+      orange: "#c87527",
+      green: "#39a65a",
+      blue: "#2f78d9"
+    };
+
+    const route = [
+      { x: 112, y: 475 },
+      { x: 178, y: 440 },
+      { x: 244, y: 396 },
+      { x: 296, y: 338 },
+      { x: 322, y: 252 },
+      { x: 394, y: 178 },
+      { x: 520, y: 132 },
+      { x: 648, y: 162 },
+      { x: 736, y: 246 }
+    ];
+
+    const ownerPath = [
+      { x: 425, y: 118 },
+      { x: 515, y: 90 },
+      { x: 608, y: 120 },
+      { x: 558, y: 176 }
+    ];
+
+    const state = {
+      mode: "ready",
+      time: 0,
+      zoom: 1,
+      collected: 0,
+      message: "게임 대기 중... 시작을 누르면 아이들이 몰래 움직여요.",
+      result: "대기",
+      alert: 0,
+      players: [],
+      owner: { x: 470, y: 96, pathIndex: 0, pose: "idle", phase: 0 },
+      lettuces: [],
+      particles: []
+    };
+    let manualStepMode = false;
+
+    function loadImage(src) {
+      const image = new Image();
+      image.src = src;
+      return image;
+    }
+
+    function lerp(a, b, t) {
+      return a + (b - a) * t;
+    }
+
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function easeInOut(t) {
+      return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+    }
+
+    function pointOnPath(path, t) {
+      const scaled = clamp(t, 0, 0.9999) * (path.length - 1);
+      const index = Math.floor(scaled);
+      const next = Math.min(path.length - 1, index + 1);
+      const local = scaled - index;
+      return {
+        x: lerp(path[index].x, path[next].x, easeInOut(local)),
+        y: lerp(path[index].y, path[next].y, easeInOut(local))
+      };
+    }
+
+    function resetGame() {
+      state.mode = "ready";
+      state.time = 0;
+      state.collected = 0;
+      state.alert = 0;
+      state.result = "대기";
+      state.message = "게임 대기 중... 시작을 누르면 아이들이 몰래 움직여요.";
+      state.players = [
+        { id: "red", row: 0, progress: 0, speed: 0.078, offset: 0, pose: "idle", carry: 0, caught: false },
+        { id: "orange", row: 1, progress: 0, speed: 0.071, offset: -0.055, pose: "idle", carry: 0, caught: false },
+        { id: "green", row: 3, progress: 0, speed: 0.066, offset: -0.11, pose: "idle", carry: 0, caught: false },
+        { id: "blue", row: 4, progress: 0, speed: 0.061, offset: -0.17, pose: "idle", carry: 0, caught: false }
+      ];
+      state.lettuces = buildLettucePatch();
+      state.owner = { x: 470, y: 96, pathIndex: 0, pose: "idle", phase: 0 };
+      state.particles = [];
+      updateHud();
+      render();
+    }
+
+    function buildLettucePatch() {
+      const rows = [
+        { y: 82, x0: 484, x1: 910, count: 7, scale: 0.66 },
+        { y: 128, x0: 454, x1: 918, count: 8, scale: 0.74 },
+        { y: 174, x0: 430, x1: 910, count: 8, scale: 0.82 },
+        { y: 220, x0: 424, x1: 888, count: 7, scale: 0.9 },
+        { y: 266, x0: 440, x1: 856, count: 6, scale: 0.98 },
+        { y: 312, x0: 480, x1: 804, count: 5, scale: 1.05 }
+      ];
+      const lettuces = [];
+      rows.forEach((row, rowIndex) => {
+        for (let i = 0; i < row.count; i += 1) {
+          const t = row.count === 1 ? 0 : i / (row.count - 1);
+          const jitter = ((i + rowIndex) % 2 ? 7 : -5);
+          lettuces.push({
+            id: `${rowIndex}-${i}`,
+            x: lerp(row.x0, row.x1, t) + jitter,
+            y: row.y + ((i % 3) - 1) * 4,
+            scale: row.scale * (0.92 + ((i + rowIndex) % 4) * 0.035),
+            picked: false,
+            wobble: Math.random() * Math.PI * 2
+          });
+        }
+      });
+      return lettuces;
+    }
+
+    function startRound() {
+      if (state.mode === "won" || state.mode === "lost") resetGame();
+      state.mode = "playing";
+      state.result = "진행";
+      state.message = "상추밭으로 이동 중... 들키기 전에 많이 챙겨야 해요.";
+      updateHud();
+    }
+
+    function togglePause() {
+      if (state.mode === "playing") {
+        state.mode = "paused";
+        state.result = "정지";
+        state.message = "일시정지 중";
+      } else if (state.mode === "paused") {
+        state.mode = "playing";
+        state.result = "진행";
+        state.message = "다시 몰래 이동!";
+      }
+      updateHud();
+      render();
+    }
+
+    function update(dt) {
+      if (state.mode !== "playing") return;
+
+      state.time += dt;
+      const activePlayers = state.players.filter((p) => !p.caught);
+      let stealHappened = false;
+
+      for (const player of state.players) {
+        if (player.caught) {
+          player.pose = "stunned";
+          continue;
+        }
+        player.progress = clamp(player.progress + player.speed * dt, 0, 1);
+        const fieldReached = player.progress > 0.72;
+        player.pose = fieldReached ? "steal" : "sneak";
+        if (fieldReached && state.time % 0.42 < dt) {
+          const target = nearestAvailableLettuce(player);
+          if (target) {
+            target.picked = true;
+            player.carry += 1;
+            state.collected += 1;
+            stealHappened = true;
+            burstLeaves(target.x, target.y);
+          }
+        }
+      }
+
+      const ownerTarget = ownerPath[Math.floor(state.time * 0.75) % ownerPath.length];
+      state.owner.x = lerp(state.owner.x, ownerTarget.x, 0.035);
+      state.owner.y = lerp(state.owner.y, ownerTarget.y, 0.035);
+      state.owner.pose = state.alert > 0.64 ? "chase" : state.alert > 0.35 ? "notice" : "idle";
+
+      const furthest = Math.max(...state.players.map((p) => p.progress));
+      state.alert = clamp((state.time - 5) / 24 + Math.max(0, furthest - 0.68) * 0.32, 0, 1);
+
+      if (state.alert >= 1 && activePlayers.length > 0) {
+        const victim = activePlayers.reduce((best, p) => (p.progress > best.progress ? p : best), activePlayers[0]);
+        victim.caught = true;
+        victim.pose = "stunned";
+        state.alert = 0.62;
+        state.message = `${victim.id} 플레이어가 밭주인에게 들켰어요.`;
+        state.result = "들킴";
+      } else if (stealHappened) {
+        state.message = `상추 ${state.collected}개 획득!`;
+      }
+
+      if (state.collected >= 12) {
+        state.mode = "won";
+        state.result = "성공";
+        state.message = "오늘의 상추 서리 성공!";
+        state.owner.pose = "angry";
+      } else if (state.players.every((p) => p.caught)) {
+        state.mode = "lost";
+        state.result = "실패";
+        state.message = "전원 들켰어요. 다음 밤을 노려야 해요.";
+        state.owner.pose = "victory";
+      }
+
+      updateParticles(dt);
+      updateHud();
+    }
+
+    function nearestAvailableLettuce(player) {
+      const pos = playerPosition(player);
+      let best = null;
+      let bestDistance = Infinity;
+      for (const lettuce of state.lettuces) {
+        if (lettuce.picked) continue;
+        const dx = lettuce.x - pos.x;
+        const dy = lettuce.y - pos.y;
+        const distance = dx * dx + dy * dy;
+        if (distance < bestDistance) {
+          best = lettuce;
+          bestDistance = distance;
+        }
+      }
+      return bestDistance < 26000 ? best : null;
+    }
+
+    function burstLeaves(x, y) {
+      for (let i = 0; i < 7; i += 1) {
+        state.particles.push({
+          x,
+          y,
+          vx: -35 + Math.random() * 70,
+          vy: -65 - Math.random() * 38,
+          life: 0.7,
+          age: 0,
+          r: 3 + Math.random() * 3
+        });
+      }
+    }
+
+    function updateParticles(dt) {
+      for (const p of state.particles) {
+        p.age += dt;
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.vy += 100 * dt;
+      }
+      state.particles = state.particles.filter((p) => p.age < p.life);
+    }
+
+    function playerPosition(player) {
+      const t = clamp(player.progress + player.offset, 0, 1);
+      const point = pointOnPath(route, t);
+      return {
+        x: point.x + Math.sin(state.time * 5 + player.row) * 3,
+        y: point.y + player.row * 9
+      };
+    }
+
+    function render() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawBackground();
+      drawLettuces();
+      drawRouteHint();
+      drawActors();
+      drawParticles();
+      drawAlert();
+    }
+
+    function drawBackground() {
+      if (assets.bg.complete && assets.bg.naturalWidth) {
+        ctx.drawImage(assets.bg, 0, 0, canvas.width, canvas.height);
+      } else {
+        ctx.fillStyle = "#8fc86b";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+    }
+
+    function drawLettuces() {
+      const sorted = [...state.lettuces].sort((a, b) => a.y - b.y);
+      for (const lettuce of sorted) {
+        if (!lettuce.picked) drawLettuce(lettuce.x, lettuce.y, lettuce.scale, lettuce.wobble);
+      }
+    }
+
+    function drawLettuce(x, y, scale, wobble) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.scale(scale, scale * 0.86);
+      ctx.fillStyle = "rgba(36, 38, 16, 0.28)";
+      ctx.beginPath();
+      ctx.ellipse(0, 20, 24, 9, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      const leaves = [
+        [-22, -4, 22, 11, -0.7, "#4f9d25"],
+        [22, -3, 22, 11, 0.7, "#5eb52a"],
+        [-12, -12, 23, 12, -0.25, "#82c73a"],
+        [12, -12, 23, 12, 0.25, "#92d247"],
+        [0, -18, 24, 13, 0, "#c2e95e"],
+        [0, -4, 18, 10, 0.12 + Math.sin(wobble) * 0.05, "#dbf47a"]
+      ];
+      for (const [lx, ly, rx, ry, rot, color] of leaves) {
+        ctx.save();
+        ctx.translate(lx, ly);
+        ctx.rotate(rot);
+        ctx.fillStyle = color;
+        ctx.strokeStyle = "#2d651f";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+      }
+      ctx.restore();
+    }
+
+    function drawRouteHint() {
+      if (state.mode === "ready" || state.mode === "paused") {
+        ctx.save();
+        ctx.setLineDash([8, 10]);
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.65)";
+        ctx.beginPath();
+        route.forEach((p, i) => (i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)));
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+
+    function drawActors() {
+      const drawables = [];
+      for (const player of state.players) {
+        const pos = playerPosition(player);
+        drawables.push({ type: "player", player, x: pos.x, y: pos.y });
+      }
+      drawables.push({ type: "owner", x: state.owner.x, y: state.owner.y });
+      drawables.sort((a, b) => a.y - b.y);
+      for (const item of drawables) {
+        if (item.type === "owner") drawOwner(item.x, item.y);
+        else drawPlayer(item.player, item.x, item.y);
+      }
+    }
+
+    function drawPlayer(player, x, y) {
+      const col = poses[player.pose] ?? 0;
+      const row = player.row;
+      const w = 112;
+      const h = 84;
+      drawSoftShadow(x, y + 8, 42, 13, 0.26);
+      if (assets.players.complete && assets.players.naturalWidth) {
+        ctx.drawImage(
+          assets.players,
+          col * playerCell.w,
+          row * playerCell.h,
+          playerCell.w,
+          playerCell.h,
+          x - w / 2,
+          y - h + 18,
+          w,
+          h
+        );
+      } else {
+        drawFallbackPlayer(player, x, y);
+      }
+      if (player.carry > 0) {
+        drawBagBubble(x - 30, y - 36, player.carry);
+      }
+    }
+
+    function drawOwner(x, y) {
+      const [col, row] = ownerPoses[state.owner.pose] ?? ownerPoses.idle;
+      const w = 132;
+      const h = 132;
+      drawSoftShadow(x, y + 12, 48, 15, 0.3);
+      if (assets.owner.complete && assets.owner.naturalWidth) {
+        ctx.drawImage(
+          assets.owner,
+          col * ownerCell.w,
+          row * ownerCell.h,
+          ownerCell.w,
+          ownerCell.h,
+          x - w / 2,
+          y - h + 30,
+          w,
+          h
+        );
+      } else {
+        drawFallbackOwner(x, y);
+      }
+    }
+
+    function drawFallbackPlayer(player, x, y) {
+      const color = playerColors[player.id] ?? "#6b7bd8";
+      const stunned = player.pose === "stunned";
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+
+      ctx.fillStyle = stunned ? "#b9b9b9" : color;
+      ctx.strokeStyle = "rgba(38, 44, 31, 0.5)";
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.ellipse(0, -26, 17, 20, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = stunned ? "#d7d7d7" : "#ffe1a6";
+      ctx.beginPath();
+      ctx.arc(0, -54, 15, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.strokeStyle = stunned ? "#7d7d7d" : "#283b25";
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(-11, -17);
+      ctx.lineTo(-24, -3);
+      ctx.moveTo(11, -17);
+      ctx.lineTo(23, -5);
+      ctx.moveTo(-7, -7);
+      ctx.lineTo(-18, 10);
+      ctx.moveTo(7, -7);
+      ctx.lineTo(18, 10);
+      ctx.stroke();
+
+      if (player.pose === "steal") {
+        ctx.fillStyle = "rgba(255,255,255,0.9)";
+        ctx.strokeStyle = "rgba(49,68,52,0.7)";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.roundRect(17, -39, 24, 24, 7);
+        ctx.fill();
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function drawFallbackOwner(x, y) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.strokeStyle = "#2b261d";
+      ctx.lineWidth = 5;
+
+      ctx.fillStyle = "#f2c27b";
+      ctx.beginPath();
+      ctx.arc(0, -76, 20, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = state.owner.pose === "victory" ? "#7c5f31" : "#3f8c45";
+      ctx.beginPath();
+      ctx.ellipse(0, -39, 22, 31, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(-17, -25);
+      ctx.lineTo(-34, -6);
+      ctx.moveTo(17, -25);
+      ctx.lineTo(40, -13);
+      ctx.moveTo(-9, -10);
+      ctx.lineTo(-24, 18);
+      ctx.moveTo(9, -10);
+      ctx.lineTo(25, 18);
+      ctx.stroke();
+
+      if (state.owner.pose === "notice" || state.owner.pose === "chase" || state.owner.pose === "victory") {
+        ctx.fillStyle = "#e04f3f";
+        ctx.font = "900 28px system-ui, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("!", 0, -108);
+      }
+      ctx.restore();
+    }
+
+    function drawBagBubble(x, y, count) {
+      ctx.save();
+      ctx.fillStyle = "rgba(255, 255, 255, 0.88)";
+      ctx.strokeStyle = "rgba(53, 80, 65, 0.72)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect(x - 19, y - 17, 38, 30, 8);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = "#3c982e";
+      ctx.font = "900 14px system-ui, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(`x${count}`, x, y + 4);
+      ctx.restore();
+    }
+
+    function drawSoftShadow(x, y, rx, ry, alpha) {
+      ctx.save();
+      ctx.fillStyle = `rgba(36, 30, 15, ${alpha})`;
+      ctx.beginPath();
+      ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawParticles() {
+      for (const p of state.particles) {
+        const t = 1 - p.age / p.life;
+        ctx.save();
+        ctx.globalAlpha = t;
+        ctx.fillStyle = "#bdeb52";
+        ctx.strokeStyle = "#3d8528";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.ellipse(p.x, p.y, p.r * 1.6, p.r, p.age * 8, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+
+    function drawAlert() {
+      if (state.alert <= 0.02) return;
+      const width = 164;
+      const height = 16;
+      const x = canvas.width - width - 20;
+      const y = 20;
+      ctx.save();
+      ctx.fillStyle = "rgba(255, 255, 255, 0.86)";
+      ctx.strokeStyle = "rgba(48, 38, 25, 0.22)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect(x - 10, y - 8, width + 20, 40, 8);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = "#24311f";
+      ctx.font = "900 11px system-ui, sans-serif";
+      ctx.fillText("밭주인 경계", x, y + 1);
+      ctx.fillStyle = "rgba(224, 79, 63, 0.18)";
+      ctx.fillRect(x, y + 11, width, height);
+      ctx.fillStyle = "#e04f3f";
+      ctx.fillRect(x, y + 11, width * state.alert, height);
+      ctx.restore();
+    }
+
+    function updateHud() {
+      document.getElementById("lettuceMetric").textContent = `${state.collected}/12`;
+      document.getElementById("alertMetric").textContent = `${Math.round(state.alert * 100)}%`;
+      document.getElementById("resultMetric").textContent = state.result;
+      document.getElementById("log").textContent = state.message;
+      document.getElementById("zoomLabel").textContent = `${state.zoom.toFixed(1)}x`;
+    }
+
+    function frame(now) {
+      if (!frame.last) frame.last = now;
+      const dt = Math.min(0.05, (now - frame.last) / 1000);
+      frame.last = now;
+      if (!manualStepMode) update(dt);
+      render();
+      requestAnimationFrame(frame);
+    }
+
+    function setZoom(delta) {
+      state.zoom = clamp(Number((state.zoom + delta).toFixed(1)), 0.8, 1.4);
+      canvas.style.transform = `scale(${state.zoom})`;
+      canvas.style.transformOrigin = "center";
+      updateHud();
+    }
+
+    document.getElementById("startBtn").addEventListener("click", startRound);
+    document.getElementById("pauseBtn").addEventListener("click", togglePause);
+    document.getElementById("resetBtn").addEventListener("click", resetGame);
+    document.getElementById("zoomOutBtn").addEventListener("click", () => setZoom(-0.1));
+    document.getElementById("zoomInBtn").addEventListener("click", () => setZoom(0.1));
+    document.getElementById("helpBtn").addEventListener("click", () => {
+      state.message = "상추는 지금 임시 canvas sprite예요. 실제 PNG가 들어오면 같은 좌표에 교체하면 됩니다.";
+      updateHud();
+    });
+    document.getElementById("sendBtn").addEventListener("click", () => {
+      const input = document.getElementById("chatInput");
+      if (input.value.trim()) {
+        state.message = `채팅: ${input.value.trim()}`;
+        input.value = "";
+        updateHud();
+      }
+    });
+
+    window.addEventListener("keydown", (event) => {
+      if (event.key === " ") {
+        event.preventDefault();
+        state.mode === "playing" ? togglePause() : startRound();
+      }
+      if (event.key.toLowerCase() === "r") resetGame();
+      if (event.key.toLowerCase() === "f") {
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+        else document.exitFullscreen?.();
+      }
+    });
+
+    window.advanceTime = (ms) => {
+      manualStepMode = true;
+      const steps = Math.max(1, Math.round(ms / (1000 / 60)));
+      for (let i = 0; i < steps; i += 1) update(1 / 60);
+      render();
+    };
+
+    window.render_game_to_text = () => JSON.stringify({
+      coordinateSystem: "canvas 960x640, origin top-left, x right, y down",
+      mode: state.mode,
+      result: state.result,
+      collected: state.collected,
+      target: 12,
+      alert: Number(state.alert.toFixed(3)),
+      owner: { x: Math.round(state.owner.x), y: Math.round(state.owner.y), pose: state.owner.pose },
+      players: state.players.map((p) => {
+        const pos = playerPosition(p);
+        return {
+          id: p.id,
+          x: Math.round(pos.x),
+          y: Math.round(pos.y),
+          progress: Number(p.progress.toFixed(3)),
+          pose: p.pose,
+          carry: p.carry,
+          caught: p.caught
+        };
+      }),
+      lettuceRemaining: state.lettuces.filter((l) => !l.picked).length,
+      assets: Object.fromEntries(Object.entries(assets).map(([key, image]) => [
+        key,
+        {
+          complete: image.complete,
+          naturalWidth: image.naturalWidth,
+          naturalHeight: image.naturalHeight
+        }
+      ])),
+      message: state.message
+    });
+
+    Promise.all(Object.values(assets).map((image) => new Promise((resolve) => {
+      if (image.complete) resolve();
+      image.addEventListener("load", resolve, { once: true });
+      image.addEventListener("error", resolve, { once: true });
+    }))).then(render);
+
+    resetGame();
+    requestAnimationFrame(frame);
+  </script>
+</body>
+</html>

@@ -1,0 +1,1628 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Symphony Concept for Codex Orchestration</title>
+  <style>
+    :root {
+      --paper: #f7f5f0;
+      --paper-strong: #fffdf7;
+      --ink: #171717;
+      --muted: #626b73;
+      --line: #d7d2c8;
+      --blue: #2f6f9f;
+      --blue-soft: #dcebf3;
+      --green: #28785b;
+      --green-soft: #dff0e8;
+      --amber: #986b19;
+      --amber-soft: #f4e6c4;
+      --red: #aa4c45;
+      --red-soft: #f3dedb;
+      --violet: #6d5aa7;
+      --violet-soft: #e5def2;
+      --shadow: 0 18px 50px rgba(28, 25, 20, 0.1);
+      --radius: 8px;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      line-height: 1.55;
+      letter-spacing: 0;
+    }
+
+    a {
+      color: var(--blue);
+      text-decoration-thickness: 1px;
+      text-underline-offset: 3px;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      border-bottom: 1px solid rgba(23, 23, 23, 0.1);
+      background: rgba(247, 245, 240, 0.94);
+      backdrop-filter: blur(14px);
+    }
+
+    .topbar-inner {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      min-height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .mark {
+      width: 30px;
+      height: 30px;
+      border: 2px solid var(--ink);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+    }
+
+    .mark svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .brand-title {
+      font-weight: 780;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .nav {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 8px 0;
+      scrollbar-width: none;
+    }
+
+    .nav::-webkit-scrollbar {
+      display: none;
+    }
+
+    .nav a {
+      color: var(--ink);
+      text-decoration: none;
+      font-size: 13px;
+      border: 1px solid transparent;
+      padding: 7px 10px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .nav a:hover,
+    .nav a:focus-visible {
+      border-color: var(--line);
+      background: var(--paper-strong);
+      outline: none;
+    }
+
+    .hero {
+      border-bottom: 1px solid var(--line);
+      background: var(--paper-strong);
+    }
+
+    .hero-inner {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 54px 0 42px;
+      display: grid;
+      grid-template-columns: minmax(0, 0.95fr) minmax(420px, 1.05fr);
+      gap: 36px;
+      align-items: center;
+    }
+
+    .eyebrow {
+      margin: 0 0 14px;
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 760;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 780px;
+      font-size: 48px;
+      line-height: 1.04;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      margin: 18px 0 0;
+      max-width: 720px;
+      color: #34383c;
+      font-size: 18px;
+    }
+
+    .hero-actions {
+      margin-top: 28px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .action {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 42px;
+      padding: 9px 14px;
+      border-radius: 7px;
+      border: 1px solid var(--ink);
+      background: var(--ink);
+      color: var(--paper-strong);
+      text-decoration: none;
+      font-weight: 720;
+    }
+
+    .action.secondary {
+      background: transparent;
+      color: var(--ink);
+      border-color: var(--line);
+    }
+
+    .action svg {
+      width: 18px;
+      height: 18px;
+      flex: 0 0 auto;
+    }
+
+    .hero-visual {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #ffffff;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .board-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      background: #fbfaf6;
+    }
+
+    .window-dots {
+      display: flex;
+      gap: 7px;
+    }
+
+    .window-dots span {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--line);
+    }
+
+    .board-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-family: var(--mono);
+    }
+
+    .mini-board {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      padding: 16px;
+    }
+
+    .lane {
+      min-height: 250px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #faf8f2;
+      padding: 10px;
+    }
+
+    .lane h3 {
+      margin: 0 0 10px;
+      font-size: 13px;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .count {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .ticket {
+      border: 1px solid rgba(23, 23, 23, 0.12);
+      border-left: 4px solid var(--blue);
+      border-radius: 6px;
+      background: #ffffff;
+      padding: 10px;
+      margin-bottom: 8px;
+      min-height: 76px;
+    }
+
+    .ticket.green {
+      border-left-color: var(--green);
+    }
+
+    .ticket.amber {
+      border-left-color: var(--amber);
+    }
+
+    .ticket.red {
+      border-left-color: var(--red);
+    }
+
+    .ticket-title {
+      margin: 0;
+      font-size: 13px;
+      font-weight: 720;
+    }
+
+    .ticket-meta {
+      margin-top: 7px;
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 22px;
+      border-radius: 999px;
+      padding: 3px 7px;
+      background: var(--blue-soft);
+      color: #154e72;
+      font-size: 11px;
+      font-family: var(--mono);
+      white-space: nowrap;
+    }
+
+    .pill.green {
+      background: var(--green-soft);
+      color: #1a5d44;
+    }
+
+    .pill.amber {
+      background: var(--amber-soft);
+      color: #6f4a0d;
+    }
+
+    .pill.red {
+      background: var(--red-soft);
+      color: #7c2d27;
+    }
+
+    .section {
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section-inner {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 48px 0;
+    }
+
+    .section-heading {
+      display: grid;
+      grid-template-columns: minmax(0, 0.8fr) minmax(260px, 0.7fr);
+      gap: 24px;
+      align-items: end;
+      margin-bottom: 24px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 30px;
+      line-height: 1.16;
+      letter-spacing: 0;
+    }
+
+    .section-note {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .definition-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    .definition-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--paper-strong);
+      padding: 18px;
+      min-height: 230px;
+    }
+
+    .definition-card h3,
+    .compare-panel h3,
+    .component h3,
+    .state-detail h3,
+    .fit-card h3,
+    .source-card h3 {
+      margin: 0 0 10px;
+      font-size: 17px;
+      line-height: 1.25;
+    }
+
+    .definition-card p,
+    .compare-panel p,
+    .component p,
+    .state-detail p,
+    .fit-card p,
+    .source-card p {
+      margin: 0;
+      color: #41474d;
+      font-size: 14px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      margin-bottom: 12px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-family: var(--mono);
+      background: #ece8df;
+      color: var(--muted);
+    }
+
+    .compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .compare-panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--paper-strong);
+      padding: 20px;
+    }
+
+    .compare-panel strong {
+      color: var(--ink);
+    }
+
+    .flow-list {
+      margin: 18px 0 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 10px;
+    }
+
+    .flow-list li {
+      display: grid;
+      grid-template-columns: 30px minmax(0, 1fr);
+      gap: 10px;
+      align-items: start;
+      color: #3f454a;
+      font-size: 14px;
+    }
+
+    .step-num {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--ink);
+      color: #fff;
+      font-family: var(--mono);
+      font-size: 12px;
+      line-height: 1;
+    }
+
+    .architecture {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 16px;
+    }
+
+    .diagram {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fffdf7;
+      overflow: hidden;
+    }
+
+    .diagram-grid {
+      display: grid;
+      grid-template-columns: 1fr 44px 1fr 44px 1fr;
+      gap: 0;
+      align-items: stretch;
+      padding: 18px;
+    }
+
+    .diagram-node {
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #ffffff;
+      min-height: 170px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .diagram-node h3 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .diagram-node p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .diagram-node code {
+      display: inline-flex;
+      width: fit-content;
+      max-width: 100%;
+      overflow-wrap: anywhere;
+      color: #252525;
+      background: #f1ede4;
+      border-radius: 6px;
+      padding: 5px 7px;
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+
+    .arrow {
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+    }
+
+    .arrow svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .components {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .component {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--paper-strong);
+      padding: 16px;
+      min-height: 180px;
+    }
+
+    .component .tag {
+      margin-bottom: 10px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 0 0 18px;
+    }
+
+    .tab {
+      min-height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--paper-strong);
+      color: var(--ink);
+      padding: 8px 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tab:hover,
+    .tab:focus-visible {
+      border-color: var(--ink);
+      outline: none;
+    }
+
+    .tab[aria-selected="true"] {
+      background: var(--ink);
+      border-color: var(--ink);
+      color: var(--paper-strong);
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: currentColor;
+      flex: 0 0 auto;
+    }
+
+    .state-panel {
+      display: grid;
+      grid-template-columns: 340px minmax(0, 1fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .state-list {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: var(--paper-strong);
+    }
+
+    .state-item {
+      width: 100%;
+      min-height: 58px;
+      padding: 12px 14px;
+      border: 0;
+      border-bottom: 1px solid var(--line);
+      background: transparent;
+      color: var(--ink);
+      text-align: left;
+      cursor: pointer;
+      display: grid;
+      grid-template-columns: 28px minmax(0, 1fr);
+      gap: 10px;
+      align-items: center;
+    }
+
+    .state-item:last-child {
+      border-bottom: 0;
+    }
+
+    .state-item:hover,
+    .state-item:focus-visible {
+      background: #f2eee5;
+      outline: none;
+    }
+
+    .state-item[aria-current="true"] {
+      background: #e8f1f3;
+    }
+
+    .state-index {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--blue);
+      color: #fff;
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+
+    .state-copy {
+      min-width: 0;
+    }
+
+    .state-title {
+      display: block;
+      font-weight: 720;
+      overflow-wrap: anywhere;
+    }
+
+    .state-sub {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      overflow-wrap: anywhere;
+    }
+
+    .state-detail {
+      min-height: 420px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--paper-strong);
+      padding: 22px;
+    }
+
+    .detail-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 0 0 16px;
+    }
+
+    .detail-list {
+      display: grid;
+      gap: 10px;
+      margin: 18px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .detail-list li {
+      border-left: 3px solid var(--blue);
+      padding-left: 12px;
+      color: #3f454a;
+      font-size: 14px;
+    }
+
+    .code-block {
+      margin: 18px 0 0;
+      background: #1f2426;
+      color: #f7f5f0;
+      border-radius: 7px;
+      padding: 16px;
+      overflow-x: auto;
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .fit-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .fit-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--paper-strong);
+      padding: 18px;
+      min-height: 250px;
+    }
+
+    .fit-card ul {
+      margin: 14px 0 0;
+      padding-left: 18px;
+      color: #3f454a;
+      font-size: 14px;
+    }
+
+    .fit-card li + li {
+      margin-top: 8px;
+    }
+
+    .status-machine {
+      margin-top: 20px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #ffffff;
+      padding: 16px;
+    }
+
+    .machine-row {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 10px;
+    }
+
+    .machine-state {
+      min-height: 102px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      padding: 12px;
+      background: #fbfaf6;
+      position: relative;
+    }
+
+    .machine-state::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: -10px;
+      width: 10px;
+      height: 1px;
+      background: var(--line);
+    }
+
+    .machine-state:last-child::after {
+      display: none;
+    }
+
+    .machine-state strong {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 7px;
+    }
+
+    .machine-state span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .principles {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .principle {
+      display: grid;
+      grid-template-columns: 42px minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--paper-strong);
+      padding: 18px;
+    }
+
+    .principle-icon {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 7px;
+      background: var(--green-soft);
+      color: var(--green);
+    }
+
+    .principle-icon svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .principle h3 {
+      margin: 0 0 6px;
+      font-size: 17px;
+    }
+
+    .principle p {
+      margin: 0;
+      color: #41474d;
+      font-size: 14px;
+    }
+
+    .sources {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .source-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--paper-strong);
+      padding: 18px;
+      min-height: 170px;
+    }
+
+    .footer {
+      background: #171717;
+      color: #f7f5f0;
+    }
+
+    .footer-inner {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 26px 0;
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      flex-wrap: wrap;
+      color: rgba(247, 245, 240, 0.78);
+      font-size: 13px;
+    }
+
+    .footer code {
+      color: #ffffff;
+      font-family: var(--mono);
+    }
+
+    @media (max-width: 980px) {
+      .hero-inner,
+      .section-heading,
+      .compare,
+      .state-panel {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-inner {
+        padding-top: 40px;
+      }
+
+      h1 {
+        font-size: 38px;
+      }
+
+      .definition-grid,
+      .components,
+      .fit-grid,
+      .sources {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .diagram-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .arrow {
+        min-height: 28px;
+        transform: rotate(90deg);
+      }
+
+      .machine-row {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .machine-state::after {
+        display: none;
+      }
+    }
+
+    @media (max-width: 680px) {
+      .topbar-inner {
+        width: min(100% - 22px, 1180px);
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .hero-inner,
+      .section-inner {
+        width: min(100% - 22px, 1180px);
+      }
+
+      .hero-inner {
+        padding: 30px 0;
+      }
+
+      h1 {
+        font-size: 32px;
+      }
+
+      .lead {
+        font-size: 16px;
+      }
+
+      .mini-board {
+        grid-template-columns: 1fr;
+      }
+
+      .definition-grid,
+      .components,
+      .fit-grid,
+      .principles,
+      .sources {
+        grid-template-columns: 1fr;
+      }
+
+      .state-detail {
+        min-height: auto;
+      }
+
+      .machine-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 3v18"></path>
+            <path d="M4 12h16"></path>
+            <path d="M7 7l10 10"></path>
+            <path d="M17 7L7 17"></path>
+          </svg>
+        </div>
+        <div class="brand-title">Symphony 개념 설명</div>
+      </div>
+      <nav class="nav" aria-label="페이지 이동">
+        <a href="#definition">정의</a>
+        <a href="#compare">비교</a>
+        <a href="#architecture">구조</a>
+        <a href="#lifecycle">흐름</a>
+        <a href="#spritemake">SpriteMake 적용</a>
+        <a href="#sources">출처</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-inner">
+        <div>
+          <p class="eyebrow">Codex orchestration pattern</p>
+          <h1>Symphony는 에이전트를 직접 조종하는 방식에서, 작업 보드가 에이전트를 지휘하는 방식으로 바꾸는 개념이다.</h1>
+          <p class="lead">
+            핵심은 “Codex 세션을 몇 개 켜서 사람이 계속 운전한다”가 아니라,
+            “이슈, 티켓, batch 같은 작업 단위를 중심에 두고 각 작업마다 격리된 에이전트 실행 환경을 붙인다”는 전환이다.
+          </p>
+          <div class="hero-actions">
+            <a class="action" href="#lifecycle">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M5 12h14"></path>
+                <path d="M13 6l6 6-6 6"></path>
+              </svg>
+              흐름 보기
+            </a>
+            <a class="action secondary" href="#spritemake">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M4 5h16v14H4z"></path>
+                <path d="M8 9h8"></path>
+                <path d="M8 13h5"></path>
+              </svg>
+              SpriteMake 예시
+            </a>
+          </div>
+        </div>
+
+        <div class="hero-visual" aria-label="작업 보드가 에이전트를 지휘하는 예시">
+          <div class="board-header">
+            <div class="window-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+            <div class="board-label">Issue tracker as control plane</div>
+          </div>
+          <div class="mini-board">
+            <div class="lane">
+              <h3>Ready <span class="count">3</span></h3>
+              <article class="ticket">
+                <p class="ticket-title">SPR-148 refine dragon atlas request</p>
+                <div class="ticket-meta">
+                  <span class="pill">prompt</span>
+                  <span class="pill green">agent assigned</span>
+                </div>
+              </article>
+              <article class="ticket amber">
+                <p class="ticket-title">QA generated fire variant</p>
+                <div class="ticket-meta">
+                  <span class="pill amber">bbox</span>
+                  <span class="pill">manifest</span>
+                </div>
+              </article>
+            </div>
+            <div class="lane">
+              <h3>Running <span class="count">2</span></h3>
+              <article class="ticket green">
+                <p class="ticket-title">Codex workspace: SPR-151</p>
+                <div class="ticket-meta">
+                  <span class="pill green">isolated</span>
+                  <span class="pill">WORKFLOW.md</span>
+                </div>
+              </article>
+              <article class="ticket">
+                <p class="ticket-title">Prepare review packet</p>
+                <div class="ticket-meta">
+                  <span class="pill">preview</span>
+                  <span class="pill amber">CI/QA</span>
+                </div>
+              </article>
+            </div>
+            <div class="lane">
+              <h3>Human Review <span class="count">1</span></h3>
+              <article class="ticket red">
+                <p class="ticket-title">Sprite batch ready for approval</p>
+                <div class="ticket-meta">
+                  <span class="pill red">needs eyes</span>
+                  <span class="pill green">QA passed</span>
+                </div>
+              </article>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="definition" class="section">
+      <div class="section-inner">
+        <div class="section-heading">
+          <h2>한 문장 정의</h2>
+          <p class="section-note">
+            Symphony는 “에이전트 하나”가 아니라, 여러 Codex 실행을 작업 단위로 계속 돌리는 운영 방식이다.
+          </p>
+        </div>
+        <div class="definition-grid">
+          <article class="definition-card">
+            <span class="tag">Control plane</span>
+            <h3>이슈 트래커가 지휘부가 된다</h3>
+            <p>
+              Linear나 GitHub Issue 같은 작업 보드가 “무슨 일이 열려 있고, 무엇이 막혔고, 무엇이 리뷰 대기인지”를 결정한다.
+              사람은 세션 목록을 기억하지 않고 티켓 상태를 본다.
+            </p>
+          </article>
+          <article class="definition-card">
+            <span class="tag">Always-on</span>
+            <h3>열린 작업마다 에이전트가 붙는다</h3>
+            <p>
+              활성 상태의 작업은 전담 workspace와 agent run을 얻는다.
+              실행이 멈추거나 실패하면 orchestrator가 재시도하거나 정리한다.
+            </p>
+          </article>
+          <article class="definition-card">
+            <span class="tag">Policy</span>
+            <h3>규칙은 repo 안에 둔다</h3>
+            <p>
+              팀의 작업 규칙, 검증 방식, handoff 조건은 <code>WORKFLOW.md</code> 같은 문서에 둔다.
+              에이전트가 매번 같은 기준으로 움직이게 만드는 장치다.
+            </p>
+          </article>
+          <article class="definition-card">
+            <span class="tag">Human role</span>
+            <h3>사람은 운전자가 아니라 리뷰어다</h3>
+            <p>
+              사람이 매 스텝을 조종하는 대신, 결과물, PR, QA 로그, 리뷰 패킷을 확인한다.
+              관심은 “세션 관리”에서 “작업 품질 관리”로 옮겨간다.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="compare" class="section">
+      <div class="section-inner">
+        <div class="section-heading">
+          <h2>기존 Codex와 Symphony의 차이</h2>
+          <p class="section-note">
+            둘 다 Codex를 쓰지만, 사람이 붙잡고 있는 대상이 다르다.
+          </p>
+        </div>
+        <div class="compare">
+          <article class="compare-panel">
+            <span class="tag">Interactive agent</span>
+            <h3>기존 방식: 세션 중심</h3>
+            <p>
+              사람이 Codex 세션을 열고, 지시하고, 로그를 보고, 중간에 방향을 바꾸고, 멈췄는지 직접 확인한다.
+              작은 작업에는 빠르지만 여러 세션을 동시에 굴리면 기억해야 할 맥락이 급격히 늘어난다.
+            </p>
+            <ol class="flow-list">
+              <li><span class="step-num">1</span><span>사람이 터미널이나 웹에서 Codex 세션을 시작한다.</span></li>
+              <li><span class="step-num">2</span><span>작업 설명을 직접 입력하고, 진행 중에 계속 확인한다.</span></li>
+              <li><span class="step-num">3</span><span>실패하거나 헷갈리면 사람이 다시 지시한다.</span></li>
+              <li><span class="step-num">4</span><span>결과를 모아 PR, 문서, QA 상태를 사람이 정리한다.</span></li>
+            </ol>
+          </article>
+          <article class="compare-panel">
+            <span class="tag">Symphony pattern</span>
+            <h3>Symphony 방식: 작업 중심</h3>
+            <p>
+              사람이 티켓을 만들면 orchestrator가 적격 작업을 찾아 workspace를 만들고 agent를 실행한다.
+              사람은 작업 보드와 리뷰 결과를 보고 개입한다.
+            </p>
+            <ol class="flow-list">
+              <li><span class="step-num">1</span><span>사람이 Linear/GitHub Issue/SpriteMake batch 같은 작업 단위를 만든다.</span></li>
+              <li><span class="step-num">2</span><span>orchestrator가 상태를 읽고 실행 가능한 작업을 고른다.</span></li>
+              <li><span class="step-num">3</span><span>작업별 workspace에서 Codex가 구현, 조사, 검증, 보고를 수행한다.</span></li>
+              <li><span class="step-num">4</span><span>사람은 Human Review 상태의 결과물만 깊게 본다.</span></li>
+            </ol>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="architecture" class="section">
+      <div class="section-inner">
+        <div class="section-heading">
+          <h2>구조를 그림으로 보면</h2>
+          <p class="section-note">
+            Symphony는 화려한 UI 이름이 아니라, tracker, workspace, agent runner, workflow policy를 묶는 얇은 운영 계층이다.
+          </p>
+        </div>
+        <div class="architecture">
+          <div class="diagram" role="img" aria-label="Symphony architecture diagram">
+            <div class="diagram-grid">
+              <div class="diagram-node">
+                <div>
+                  <h3>Issue Tracker</h3>
+                  <p>작업의 원천. 상태, 우선순위, block 관계, 담당 범위를 담는다.</p>
+                </div>
+                <code>Linear / GitHub Issues / output queue</code>
+              </div>
+              <div class="arrow" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path>
+                </svg>
+              </div>
+              <div class="diagram-node">
+                <div>
+                  <h3>Symphony Orchestrator</h3>
+                  <p>주기적으로 tracker를 읽고, 작업 실행/중단/재시도/정리를 판단한다.</p>
+                </div>
+                <code>poll, dispatch, retry, reconcile</code>
+              </div>
+              <div class="arrow" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path>
+                </svg>
+              </div>
+              <div class="diagram-node">
+                <div>
+                  <h3>Workspace + Agent</h3>
+                  <p>작업별 격리 폴더에서 Codex가 repo 규칙을 읽고 실제 일을 한다.</p>
+                </div>
+                <code>WORKFLOW.md + Codex run</code>
+              </div>
+            </div>
+          </div>
+
+          <div class="components">
+            <article class="component">
+              <span class="tag">Workflow Loader</span>
+              <h3>작업 규칙 로딩</h3>
+              <p><code>WORKFLOW.md</code>의 front matter와 prompt body를 읽어 agent 실행 지침으로 바꾼다.</p>
+            </article>
+            <article class="component">
+              <span class="tag">Workspace Manager</span>
+              <h3>격리 환경 생성</h3>
+              <p>이슈 ID를 workspace path에 매핑하고, 작업별 파일 시스템 영역을 준비한다.</p>
+            </article>
+            <article class="component">
+              <span class="tag">Agent Runner</span>
+              <h3>Codex 실행</h3>
+              <p>작업 내용과 workflow prompt를 합쳐 Codex app-server client 또는 agent 실행을 시작한다.</p>
+            </article>
+            <article class="component">
+              <span class="tag">Observability</span>
+              <h3>상태 관측</h3>
+              <p>여러 agent가 동시에 돌 때 로그, 상태, retry 정보를 사람이 볼 수 있어야 한다.</p>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="lifecycle" class="section">
+      <div class="section-inner">
+        <div class="section-heading">
+          <h2>작업 하나가 흘러가는 과정</h2>
+          <p class="section-note">
+            아래 버튼을 눌러 각 단계에서 누가 무엇을 하는지 확인할 수 있다.
+          </p>
+        </div>
+
+        <div class="tabs" role="tablist" aria-label="작업 흐름 관점 선택">
+          <button class="tab" role="tab" aria-selected="true" data-mode="software"><span class="dot"></span>소프트웨어 작업</button>
+          <button class="tab" role="tab" aria-selected="false" data-mode="sprite"><span class="dot"></span>SpriteMake 작업</button>
+        </div>
+
+        <div class="state-panel">
+          <div class="state-list" aria-label="상태 목록" id="stateList"></div>
+          <article class="state-detail" id="stateDetail" aria-live="polite"></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="spritemake" class="section">
+      <div class="section-inner">
+        <div class="section-heading">
+          <h2>SpriteMake에 적용하면 무엇이 좋아지나</h2>
+          <p class="section-note">
+            여기서는 거대한 Symphony 서버보다, output 폴더와 markdown 상태를 작업 큐처럼 쓰는 mini-Symphony가 현실적이다.
+          </p>
+        </div>
+
+        <div class="fit-grid">
+          <article class="fit-card">
+            <span class="tag">Request refinement</span>
+            <h3>대충 말한 요청을 제작용 브리프로 정제</h3>
+            <p>
+              “드래곤 스프라이트 만들어줘”를 strict atlas, variant, anchor, Y-axis baseline, QA 조건이 포함된 생성 요청으로 바꾼다.
+            </p>
+            <ul>
+              <li>원문 요청 보존</li>
+              <li>누락된 runtime 조건 기본값 보강</li>
+              <li><code>gpt-image-2</code> copy-ready prompt 생성</li>
+            </ul>
+          </article>
+          <article class="fit-card">
+            <span class="tag">Batch state machine</span>
+            <h3>output batch를 상태 머신으로 관리</h3>
+            <p>
+              각 batch 폴더가 티켓처럼 동작한다. 폴더 안의 MD와 manifest, QA 상태를 보고 다음 액션을 자동으로 정한다.
+            </p>
+            <ul>
+              <li><code>REQUESTS.md</code>가 비면 refine 필요</li>
+              <li><code>generated/</code>에 PNG가 생기면 QA 필요</li>
+              <li>QA 통과 전에는 <code>final/</code> 금지</li>
+            </ul>
+          </article>
+          <article class="fit-card">
+            <span class="tag">Review packet</span>
+            <h3>사람이 볼 결과만 모아주기</h3>
+            <p>
+              모든 중간 로그를 사람이 붙잡는 대신, 마지막에 검토해야 할 프롬프트, manifest, bbox, preview tool 경로를 묶어준다.
+            </p>
+            <ul>
+              <li>프롬프트 원문과 보강 이유</li>
+              <li>alpha bbox / per-cell bbox 요약</li>
+              <li>게임 프로젝트로 이동 가능 여부</li>
+            </ul>
+          </article>
+        </div>
+
+        <div class="status-machine">
+          <div class="machine-row" aria-label="SpriteMake mini Symphony 상태 흐름">
+            <div class="machine-state">
+              <strong>Intake</strong>
+              <span>자연어 요청 저장, batch 폴더 생성</span>
+            </div>
+            <div class="machine-state">
+              <strong>Refine</strong>
+              <span>brief, target path, atlas contract 보강</span>
+            </div>
+            <div class="machine-state">
+              <strong>Prompt Ready</strong>
+              <span><code>gpt-image-2</code>용 copy-ready prompt 준비</span>
+            </div>
+            <div class="machine-state">
+              <strong>Generated</strong>
+              <span>외부 생성 PNG를 <code>generated/</code>에 배치</span>
+            </div>
+            <div class="machine-state">
+              <strong>QA</strong>
+              <span>size, grid, anchor, baseline, bbox 검사</span>
+            </div>
+            <div class="machine-state">
+              <strong>Final Candidate</strong>
+              <span>QA 통과 후 게임 integration 후보로 표시</span>
+            </div>
+          </div>
+        </div>
+
+        <pre class="code-block"><code>Example mini-Symphony rule for SpriteMake
+
+IF output/*/PROMPT.md exists
+AND REQUESTS.md has missing runtime fields
+THEN run request refinement
+
+IF generated/*.png appears
+THEN run PNG QA and update MANIFEST.md + QA.md
+
+IF QA passes
+THEN mark as final candidate
+ELSE keep in generated/ and write regeneration notes</code></pre>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-inner">
+        <div class="section-heading">
+          <h2>쓸 때의 감각</h2>
+          <p class="section-note">
+            Symphony의 장점은 에이전트가 똑똑해지는 것보다, 일을 담는 그릇이 에이전트 친화적으로 바뀌는 데 있다.
+          </p>
+        </div>
+        <div class="principles">
+          <article class="principle">
+            <div class="principle-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 6h16"></path><path d="M4 12h10"></path><path d="M4 18h7"></path>
+              </svg>
+            </div>
+            <div>
+              <h3>작업을 작게만 쪼개지 않아도 된다</h3>
+              <p>이슈가 여러 PR, 조사, 하위 작업으로 번질 수 있다. 에이전트가 새 follow-up task를 제안하는 구조도 가능하다.</p>
+            </div>
+          </article>
+          <article class="principle">
+            <div class="principle-icon" aria-hidden="true" style="background: var(--amber-soft); color: var(--amber);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 3v18"></path><path d="M5 8h14"></path><path d="M7 16h10"></path>
+              </svg>
+            </div>
+            <div>
+              <h3>엄격한 state machine만으로는 부족하다</h3>
+              <p>OpenAI 글에서도 에이전트를 너무 딱딱한 노드로만 보면 한계가 있었다고 말한다. 목표와 도구를 주고, 좋은 handoff 기준을 세우는 쪽이 더 중요하다.</p>
+            </div>
+          </article>
+          <article class="principle">
+            <div class="principle-icon" aria-hidden="true" style="background: var(--violet-soft); color: var(--violet);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16v16H4z"></path><path d="M8 8h8v8H8z"></path>
+              </svg>
+            </div>
+            <div>
+              <h3>격리는 필수다</h3>
+              <p>작업별 workspace가 있어야 여러 agent run이 서로 파일을 덮어쓰거나 상태를 혼동하지 않는다.</p>
+            </div>
+          </article>
+          <article class="principle">
+            <div class="principle-icon" aria-hidden="true" style="background: var(--red-soft); color: var(--red);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2l9 18H3L12 2z"></path><path d="M12 8v5"></path><path d="M12 17h.01"></path>
+              </svg>
+            </div>
+            <div>
+              <h3>모든 작업에 맞는 건 아니다</h3>
+              <p>강한 제품 판단, 모호한 탐색, 즉석 대화가 중요한 작업은 여전히 사람과 interactive Codex가 같이 가는 편이 낫다.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="sources" class="section">
+      <div class="section-inner">
+        <div class="section-heading">
+          <h2>참고한 공식 자료</h2>
+          <p class="section-note">
+            이 HTML은 아래 자료를 기반으로 요약하고, SpriteMake 상황에 맞게 해석한 것이다.
+          </p>
+        </div>
+        <div class="sources">
+          <article class="source-card">
+            <span class="tag">OpenAI article</span>
+            <h3>Open-source Codex orchestration: Symphony</h3>
+            <p>
+              공식 글. 이슈 트래커를 control plane으로 쓰고, 일부 팀에서 landed PR 증가를 봤다는 배경을 설명한다.
+              <br><a href="https://openai.com/index/open-source-codex-orchestration-symphony/">열기</a>
+            </p>
+          </article>
+          <article class="source-card">
+            <span class="tag">GitHub</span>
+            <h3>openai/symphony</h3>
+            <p>
+              공개 저장소. 현재는 구현체보다 spec 중심의 reference로 보는 것이 정확하다.
+              <br><a href="https://github.com/openai/symphony">열기</a>
+            </p>
+          </article>
+          <article class="source-card">
+            <span class="tag">SPEC.md</span>
+            <h3>Service specification</h3>
+            <p>
+              orchestrator, workflow loader, issue tracker client, workspace manager, agent runner 같은 구성요소가 정리되어 있다.
+              <br><a href="https://github.com/openai/symphony/blob/main/SPEC.md">열기</a>
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div>Created for <code>D:\Work\vibe\SpriteMake</code></div>
+      <div>핵심 요약: 세션을 관리하지 말고, 작업 단위를 관리한다.</div>
+    </div>
+  </footer>
+
+  <script>
+    const lifecycleData = {
+      software: [
+        {
+          title: "Ticket opened",
+          sub: "작업 보드에 실행 가능한 이슈가 생긴다",
+          tags: ["tracker", "state"],
+          heading: "이슈가 작업의 원천이 된다",
+          text: "사람은 Codex 세션을 먼저 여는 대신, Linear나 GitHub Issue에 목표와 완료 조건을 적는다. Symphony는 이슈 상태를 보고 agent를 붙일지 판단한다.",
+          bullets: [
+            "작업 설명, 우선순위, block 관계가 tracker에 남는다.",
+            "사람의 기억이 아니라 티켓 상태가 실행 기준이 된다.",
+            "PR이 없는 조사 작업도 같은 구조로 다룰 수 있다."
+          ],
+          code: "Issue: Upgrade React after Vite migration\nState: Ready\nDefinition of done: tests pass + review packet"
+        },
+        {
+          title: "Workflow loaded",
+          sub: "repo가 정한 agent 규칙을 읽는다",
+          tags: ["WORKFLOW.md", "policy"],
+          heading: "정책은 코드 옆에 버전 관리된다",
+          text: "Symphony spec에서 중요한 점은 팀별 실행 정책을 repo 내부 문서로 둔다는 것이다. 에이전트는 매번 같은 handoff 기준과 검증 규칙을 읽고 움직인다.",
+          bullets: [
+            "어떤 테스트를 돌릴지, 언제 Human Review로 넘길지 정한다.",
+            "팀별 보안/승인/샌드박스 정책을 명시할 수 있다.",
+            "실패가 반복되면 사람의 잔소리 대신 workflow를 고친다."
+          ],
+          code: "WORKFLOW.md\n---\nmax_concurrency: 4\nhandoff_state: Human Review\n---\nRun tests, summarize changes, attach review packet."
+        },
+        {
+          title: "Workspace created",
+          sub: "이슈별 격리 작업 공간을 만든다",
+          tags: ["workspace", "isolation"],
+          heading: "작업마다 자기 공간을 갖는다",
+          text: "여러 agent가 동시에 움직이면 파일 충돌과 맥락 오염이 생긴다. 그래서 Symphony는 이슈 ID를 기반으로 deterministic workspace를 만들고, 그 안에서 실행한다.",
+          bullets: [
+            "작업별 repo checkout 또는 작업 폴더를 분리한다.",
+            "중단된 작업도 workspace를 보존해 이어갈 수 있다.",
+            "terminal state가 되면 workspace cleanup 대상이 된다."
+          ],
+          code: "workspaces/\n  ENG-1042/\n    repo/\n    logs/\n    run-state.json"
+        },
+        {
+          title: "Agent runs",
+          sub: "Codex가 실행하고 필요하면 도구를 쓴다",
+          tags: ["Codex", "tools"],
+          heading: "에이전트는 구현자가 아니라 작업자 전체에 가까워진다",
+          text: "초기에는 구현만 시켜도 충분해 보이지만, 실제로는 CI 로그 읽기, conflict 해결, follow-up issue 작성, 리뷰 반영 같은 일까지 이어진다.",
+          bullets: [
+            "agent runner가 이슈와 workflow를 합쳐 prompt를 만든다.",
+            "에이전트는 gh CLI, 테스트, 브라우저, MCP 같은 도구를 사용할 수 있다.",
+            "결과가 빗나가면 workflow와 guardrail을 개선한다."
+          ],
+          code: "Prompt = issue body + WORKFLOW.md + repo context\nRun = Codex app-server session\nOutput = commits, PRs, comments, report"
+        },
+        {
+          title: "Human Review",
+          sub: "사람이 결과 패킷을 검토한다",
+          tags: ["review", "handoff"],
+          heading: "최종 판단은 사람이 한다",
+          text: "Symphony가 성공적으로 끝난다는 말은 반드시 Done이 아니다. workflow가 정한 Human Review 상태까지 도달하고, 사람이 검토할 자료가 준비되는 것이 성공일 수 있다.",
+          bullets: [
+            "변경 요약, 테스트 결과, 스크린샷, PR 링크를 모은다.",
+            "사람은 구현 로그 전체가 아니라 검토 포인트를 본다.",
+            "좋으면 merge, 아니면 수정 티켓이나 리뷰 코멘트로 이어진다."
+          ],
+          code: "Handoff packet\n- PR link\n- tests run\n- known risks\n- screenshots/video if UI changed"
+        }
+      ],
+      sprite: [
+        {
+          title: "Natural request",
+          sub: "짧은 한국어 요청을 받는다",
+          tags: ["intake", "request"],
+          heading: "사용자는 템플릿을 몰라도 된다",
+          text: "SpriteMake에서는 사용자가 '드래곤 스프라이트 만들어줘'처럼 말해도 된다. mini-Symphony는 이 요청을 batch 작업으로 바꾸고 원문을 보존한다.",
+          bullets: [
+            "sprite-intake hook으로 output/{name}-{timestamp}를 만든다.",
+            "PROMPT.md, BATCH.md, REQUESTS.md, MANIFEST.md, QA.md를 준비한다.",
+            "생성 방식이 애매하면 Codex setup-only 또는 외부 gpt-image-2를 한 번만 묻는다."
+          ],
+          code: ".\\.agents\\hooks\\sprite-intake.ps1 -Request \"불/얼음 드래곤 스프라이트 만들어줘\""
+        },
+        {
+          title: "Brief refinement",
+          sub: "게임 제작용 조건으로 다듬는다",
+          tags: ["brief", "contract"],
+          heading: "예쁜 그림 요청을 runtime contract로 바꾼다",
+          text: "이 단계가 네가 말한 '좀 더 잘 다듬어서 보내기'에 해당한다. 에이전트가 atlas 크기, variant, row/column 의미, anchor, Y-axis baseline, QA 기준을 보강한다.",
+          bullets: [
+            "contact anchor와 Y-axis baseline을 분리해서 쓴다.",
+            "strict atlas, no gutters, no outer padding을 명시한다.",
+            "target game path가 없으면 placeholder로 남기고 숨기지 않는다."
+          ],
+          code: "Required contract\n- Canvas: 1536x1728\n- Grid: 4 x 6\n- Anchor: foot contact\n- Baseline: no Y drift"
+        },
+        {
+          title: "Prompt ready",
+          sub: "외부 gpt-image-2용 프롬프트를 만든다",
+          tags: ["gpt-image-2", "prompt"],
+          heading: "SpriteMake는 API를 호출하지 않는다",
+          text: "SpriteMake의 규칙상 API key를 저장하거나 직접 생성 API를 호출하지 않는다. 대신 외부 생성 화면에 붙여 넣을 수 있는 copy-ready prompt를 만든다.",
+          bullets: [
+            "Generation Target 블록에 gpt-image-2 요구를 넣는다.",
+            "다른 모델로 조용히 대체하지 말라는 조건을 포함한다.",
+            "mockup.html을 거치지 않았다면 prompt-inject hook으로 보강한다."
+          ],
+          code: "Generation Target:\n- Provider: OpenAI Images API\n- Required image model: gpt-image-2\n- Do not silently substitute another image model."
+        },
+        {
+          title: "PNG arrives",
+          sub: "생성 결과는 generated 폴더에 둔다",
+          tags: ["generated", "source"],
+          heading: "받은 이미지는 아직 final이 아니다",
+          text: "외부 생성에서 받은 PNG는 먼저 generated/에 둔다. 크기, alpha, grid, cell bleed, bbox를 확인하기 전에는 final asset으로 취급하지 않는다.",
+          bullets: [
+            "strict atlas가 아니면 source/intermediate로 남긴다.",
+            "PNG-32 RGBA, straight alpha, transparent corners를 확인한다.",
+            "animation atlas라면 preview tool과 manifest를 준비한다."
+          ],
+          code: "output/dragon-20260504-153000/\n  generated/dragon_attempt_01.png\n  qa/\n  manifests/\n  final/"
+        },
+        {
+          title: "QA and final candidate",
+          sub: "검수 통과 후에만 final 후보가 된다",
+          tags: ["QA", "final"],
+          heading: "게임에 넣을 수 있는지가 마지막 기준이다",
+          text: "SpriteMake의 최종 목표는 예쁜 이미지가 아니라 게임 코드가 정확히 자르고 배치할 수 있는 sprite다. QA 통과 전까지 final/로 옮기지 않는다.",
+          bullets: [
+            "final size와 grid divisibility를 확인한다.",
+            "per-cell alpha bbox와 anchor/baseline 안정성을 기록한다.",
+            "게임 프로젝트로 옮겨도 되는지 QA.md에 명시한다."
+          ],
+          code: "QA result\nsize: pass\ncell bbox: pass\nanchor: pass\nbaseline drift: pass\nstatus: final candidate"
+        }
+      ]
+    };
+
+    let currentMode = "software";
+    let currentIndex = 0;
+
+    const stateList = document.getElementById("stateList");
+    const stateDetail = document.getElementById("stateDetail");
+    const tabs = Array.from(document.querySelectorAll(".tab"));
+
+    function renderStates() {
+      const data = lifecycleData[currentMode];
+      stateList.innerHTML = "";
+      data.forEach((item, index) => {
+        const button = document.createElement("button");
+        button.className = "state-item";
+        button.type = "button";
+        button.setAttribute("aria-current", String(index === currentIndex));
+        button.innerHTML = `
+          <span class="state-index">${index + 1}</span>
+          <span class="state-copy">
+            <span class="state-title">${item.title}</span>
+            <span class="state-sub">${item.sub}</span>
+          </span>
+        `;
+        button.addEventListener("click", () => {
+          currentIndex = index;
+          renderStates();
+          renderDetail();
+        });
+        stateList.appendChild(button);
+      });
+    }
+
+    function renderDetail() {
+      const item = lifecycleData[currentMode][currentIndex];
+      const tagHtml = item.tags.map(tag => `<span class="pill">${tag}</span>`).join("");
+      const bulletHtml = item.bullets.map(text => `<li>${text}</li>`).join("");
+      stateDetail.innerHTML = `
+        <div class="detail-meta">${tagHtml}</div>
+        <h3>${item.heading}</h3>
+        <p>${item.text}</p>
+        <ul class="detail-list">${bulletHtml}</ul>
+        <pre class="code-block"><code>${escapeHtml(item.code)}</code></pre>
+      `;
+    }
+
+    function escapeHtml(value) {
+      return value
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    tabs.forEach(tab => {
+      tab.addEventListener("click", () => {
+        currentMode = tab.dataset.mode;
+        currentIndex = 0;
+        tabs.forEach(item => item.setAttribute("aria-selected", String(item === tab)));
+        renderStates();
+        renderDetail();
+      });
+    });
+
+    renderStates();
+    renderDetail();
+  </script>
+</body>
+</html>

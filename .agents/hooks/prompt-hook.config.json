@@ -1,0 +1,13 @@
+﻿{
+  "name": "spritemake-generation-target",
+  "intended_timing": "before_external_generation_prompt_send",
+  "script": ".agents/hooks/prompt-inject.ps1",
+  "purpose": "Ensure every external image generation prompt contains the OpenAI Images API gpt-image-2 requirement.",
+  "required_block": {
+    "provider": "OpenAI Images API",
+    "required_image_model": "gpt-image-2"
+  },
+  "note": "This documents the desired hook behavior for SpriteMake. Codex must call the hook or use mockup/templates that already include the same block; this file alone does not make the Codex runtime execute hooks automatically."
+}
+
+

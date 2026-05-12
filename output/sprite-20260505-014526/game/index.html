@@ -1,0 +1,687 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Hamster Care</title>
+  <link rel="icon" href="data:,">
+  <style>
+    :root {
+      color-scheme: light;
+      --page: #eef6f3;
+      --ink: #23332f;
+      --muted: #66746f;
+      --panel: #fffaf1;
+      --line: #2c3c37;
+      --accent: #f09b68;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: var(--page);
+      color: var(--ink);
+      font-family: "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+    }
+
+    main {
+      width: 100%;
+      height: 100%;
+      display: grid;
+      place-items: center;
+      padding: 16px;
+    }
+
+    canvas {
+      width: min(100vw - 32px, 1200px);
+      height: auto;
+      max-height: calc(100vh - 32px);
+      aspect-ratio: 3 / 2;
+      border: 2px solid rgba(44, 60, 55, 0.18);
+      border-radius: 8px;
+      box-shadow: 0 18px 45px rgba(57, 83, 75, 0.18);
+      background: #f8ead1;
+      touch-action: none;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <canvas id="game" width="960" height="640" aria-label="Hamster raising game"></canvas>
+  </main>
+
+  <script>
+    "use strict";
+
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d", { alpha: false });
+    const W = canvas.width;
+    const H = canvas.height;
+    const COLS = 4;
+    const ROWS = 5;
+    const CELL = 256;
+    const ANCHOR_X = 128;
+    const ANCHOR_Y = 226;
+    const habitat = { x: 48, y: 112, w: 642, h: 440 };
+    const bowl = { x: 170, y: 500 };
+    const water = { x: 312, y: 468 };
+    const wheel = { x: 510, y: 488 };
+    const bed = { x: 626, y: 500 };
+    const sheetSrc = "assets/hamster_game_atlas.png?v=strict-atlas-1";
+
+    let seed = 20260505;
+    function rand() {
+      seed = (seed * 1664525 + 1013904223) >>> 0;
+      return seed / 4294967296;
+    }
+
+    function clamp(v, min, max) {
+      return Math.max(min, Math.min(max, v));
+    }
+
+    function lerp(a, b, t) {
+      return a + (b - a) * t;
+    }
+
+    function dist(a, b, c, d) {
+      return Math.hypot(a - c, b - d);
+    }
+
+    const game = {
+      mode: "loading",
+      time: 0,
+      day: 1,
+      mealCountdown: 24,
+      mealDue: false,
+      foodLevel: 72,
+      waterLevel: 82,
+      cleanliness: 88,
+      happiness: 76,
+      message: "준비 중",
+      messageTimer: 2.5,
+      frames: [],
+      buttons: [],
+      hamsters: [],
+      pointer: { x: 0, y: 0, down: false },
+    };
+
+    function makeHamsters() {
+      game.hamsters = [
+        makeHamster("Momo", 210, 372),
+        makeHamster("Bori", 380, 452),
+        makeHamster("Nabi", 560, 392),
+      ];
+    }
+
+    function makeHamster(name, x, y) {
+      return {
+        name,
+        x,
+        y,
+        tx: x + rand() * 120 - 60,
+        ty: y + rand() * 80 - 40,
+        speed: 42 + rand() * 26,
+        state: "wander",
+        frame: Math.floor(rand() * 4),
+        frameTimer: rand(),
+        facing: rand() > 0.5 ? 1 : -1,
+        fullness: 62 + rand() * 25,
+        thirst: 70 + rand() * 18,
+        energy: 55 + rand() * 35,
+        happiness: 68 + rand() * 18,
+        restTimer: 0,
+        eatTimer: 0,
+        playTimer: 0,
+        wanderTimer: 0,
+      };
+    }
+
+    function loadImage(src) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = () => reject(new Error("image load failed: " + src));
+        img.src = src;
+      });
+    }
+
+    function buildFrames(img) {
+      const frames = [];
+      const sw = img.width / COLS;
+      const sh = img.height / ROWS;
+      for (let r = 0; r < ROWS; r += 1) {
+        const row = [];
+        for (let c = 0; c < COLS; c += 1) {
+          const off = document.createElement("canvas");
+          off.width = CELL;
+          off.height = CELL;
+          const octx = off.getContext("2d", { willReadFrequently: true });
+          octx.clearRect(0, 0, CELL, CELL);
+          octx.drawImage(img, c * sw, r * sh, sw, sh, 0, 0, CELL, CELL);
+          row.push(off);
+        }
+        frames.push(row);
+      }
+      return frames;
+    }
+
+    function isBackgroundPixel(data, idx) {
+      const r = data[idx];
+      const g = data[idx + 1];
+      const b = data[idx + 2];
+      const hi = Math.max(r, g, b);
+      const lo = Math.min(r, g, b);
+      return hi > 218 && hi - lo < 30;
+    }
+
+    function cleanupCheckerBackground(octx, width, height) {
+      const imgData = octx.getImageData(0, 0, width, height);
+      const data = imgData.data;
+      const seen = new Uint8Array(width * height);
+      const qx = [];
+      const qy = [];
+
+      function push(x, y) {
+        if (x < 0 || y < 0 || x >= width || y >= height) return;
+        const p = y * width + x;
+        if (seen[p]) return;
+        const idx = p * 4;
+        if (!isBackgroundPixel(data, idx)) return;
+        seen[p] = 1;
+        qx.push(x);
+        qy.push(y);
+      }
+
+      for (let x = 0; x < width; x += 1) {
+        push(x, 0);
+        push(x, height - 1);
+      }
+      for (let y = 0; y < height; y += 1) {
+        push(0, y);
+        push(width - 1, y);
+      }
+
+      for (let head = 0; head < qx.length; head += 1) {
+        const x = qx[head];
+        const y = qy[head];
+        const idx = (y * width + x) * 4;
+        data[idx + 3] = 0;
+        push(x + 1, y);
+        push(x - 1, y);
+        push(x, y + 1);
+        push(x, y - 1);
+      }
+
+      octx.putImageData(imgData, 0, 0);
+    }
+
+    function setMessage(text, seconds = 2.4) {
+      game.message = text;
+      game.messageTimer = seconds;
+    }
+
+    function feed() {
+      game.foodLevel = 100;
+      game.mealDue = false;
+      game.mealCountdown = 36;
+      setMessage("밥을 채웠어요");
+      game.hamsters.forEach((h) => {
+        if (h.fullness < 95) {
+          h.state = "seekFood";
+          h.tx = bowl.x + rand() * 80 - 40;
+          h.ty = bowl.y + rand() * 30 - 20;
+        }
+      });
+    }
+
+    function fillWater() {
+      game.waterLevel = 100;
+      setMessage("물병을 갈았어요");
+      game.hamsters.forEach((h) => {
+        h.thirst = clamp(h.thirst + 18, 0, 100);
+      });
+    }
+
+    function play() {
+      setMessage("쳇바퀴 시간이야");
+      game.hamsters.forEach((h) => {
+        h.state = "play";
+        h.playTimer = 5 + rand() * 3;
+        h.tx = wheel.x + rand() * 80 - 40;
+        h.ty = wheel.y + rand() * 32 - 18;
+        h.happiness = clamp(h.happiness + 12, 0, 100);
+      });
+    }
+
+    function clean() {
+      game.cleanliness = 100;
+      game.happiness = clamp(game.happiness + 8, 0, 100);
+      setMessage("집을 정리했어요");
+    }
+
+    function chooseWanderTarget(h) {
+      h.tx = habitat.x + 60 + rand() * (habitat.w - 120);
+      h.ty = habitat.y + 210 + rand() * (habitat.h - 250);
+      h.wanderTimer = 2 + rand() * 4;
+    }
+
+    function update(dt) {
+      if (game.mode !== "playing") return;
+      game.time += dt;
+      game.messageTimer = Math.max(0, game.messageTimer - dt);
+      game.mealCountdown -= dt;
+      game.cleanliness = clamp(game.cleanliness - dt * 0.32, 0, 100);
+      game.waterLevel = clamp(game.waterLevel - dt * 0.18, 0, 100);
+
+      if (game.mealCountdown <= 0 && !game.mealDue) {
+        game.mealDue = true;
+        game.foodLevel = Math.min(game.foodLevel, 18);
+        setMessage("밥 시간이야", 4);
+      }
+
+      for (const h of game.hamsters) {
+        h.frameTimer += dt;
+        const fps = h.state === "sleep" ? 3.5 : h.state === "eat" ? 6.5 : 7.5;
+        if (h.frameTimer >= 1 / fps) {
+          h.frameTimer = 0;
+          h.frame = (h.frame + 1) % 4;
+        }
+
+        h.fullness = clamp(h.fullness - dt * (game.mealDue ? 1.15 : 0.38), 0, 100);
+        h.thirst = clamp(h.thirst - dt * 0.28, 0, 100);
+        h.energy = clamp(h.energy - dt * (h.state === "play" ? 1.1 : 0.22), 0, 100);
+        h.happiness = clamp(h.happiness - dt * (game.cleanliness < 35 ? 0.4 : 0.12), 0, 100);
+
+        if (h.energy < 18 && h.state !== "sleep") {
+          h.state = "sleep";
+          h.tx = bed.x + rand() * 75 - 40;
+          h.ty = bed.y + rand() * 18 - 12;
+          h.restTimer = 7 + rand() * 5;
+        }
+
+        if (game.foodLevel > 2 && h.fullness < 72 && h.state !== "sleep" && h.state !== "eat") {
+          h.state = "seekFood";
+          h.tx = bowl.x + rand() * 80 - 40;
+          h.ty = bowl.y + rand() * 30 - 20;
+        }
+
+        if (h.state === "sleep") {
+          moveToward(h, dt, 38);
+          h.restTimer -= dt;
+          h.energy = clamp(h.energy + dt * 4.5, 0, 100);
+          if (h.restTimer <= 0 && h.energy > 60) {
+            h.state = "wander";
+            chooseWanderTarget(h);
+          }
+        } else if (h.state === "seekFood") {
+          moveToward(h, dt, h.speed + 12);
+          if (dist(h.x, h.y, bowl.x, bowl.y) < 72 && game.foodLevel > 0) {
+            h.state = "eat";
+            h.eatTimer = 4.5;
+          }
+        } else if (h.state === "eat") {
+          h.eatTimer -= dt;
+          h.fullness = clamp(h.fullness + dt * 10, 0, 100);
+          h.happiness = clamp(h.happiness + dt * 1.8, 0, 100);
+          game.foodLevel = clamp(game.foodLevel - dt * 4.5, 0, 100);
+          if (h.eatTimer <= 0 || h.fullness >= 98 || game.foodLevel <= 0) {
+            h.state = "wander";
+            chooseWanderTarget(h);
+          }
+        } else if (h.state === "play") {
+          moveToward(h, dt, h.speed + 25);
+          h.playTimer -= dt;
+          h.happiness = clamp(h.happiness + dt * 2.2, 0, 100);
+          if (h.playTimer <= 0) {
+            h.state = "wander";
+            chooseWanderTarget(h);
+          }
+        } else {
+          h.wanderTimer -= dt;
+          if (h.wanderTimer <= 0 || dist(h.x, h.y, h.tx, h.ty) < 18) {
+            chooseWanderTarget(h);
+          }
+          moveToward(h, dt, h.speed);
+        }
+
+        h.x = clamp(h.x, habitat.x + 50, habitat.x + habitat.w - 40);
+        h.y = clamp(h.y, habitat.y + 230, habitat.y + habitat.h - 38);
+      }
+
+      const avgHappy = game.hamsters.reduce((sum, h) => sum + h.happiness, 0) / game.hamsters.length;
+      const avgFull = game.hamsters.reduce((sum, h) => sum + h.fullness, 0) / game.hamsters.length;
+      game.happiness = clamp(avgHappy * 0.65 + avgFull * 0.2 + game.cleanliness * 0.15, 0, 100);
+    }
+
+    function moveToward(h, dt, speed) {
+      const dx = h.tx - h.x;
+      const dy = h.ty - h.y;
+      const len = Math.hypot(dx, dy);
+      if (len < 1) return;
+      const step = Math.min(len, speed * dt);
+      h.x += (dx / len) * step;
+      h.y += (dy / len) * step;
+      if (Math.abs(dx) > 2) h.facing = dx >= 0 ? 1 : -1;
+    }
+
+    function render() {
+      drawRoom();
+      drawItems();
+      drawHamsters();
+      drawHud();
+    }
+
+    function drawRoom() {
+      const grd = ctx.createLinearGradient(0, 0, 0, H);
+      grd.addColorStop(0, "#d9f2ee");
+      grd.addColorStop(0.58, "#f8ead1");
+      grd.addColorStop(1, "#e8c991");
+      ctx.fillStyle = grd;
+      ctx.fillRect(0, 0, W, H);
+
+      ctx.fillStyle = "#f5d99f";
+      ctx.fillRect(0, 360, W, H - 360);
+      ctx.fillStyle = "rgba(118, 88, 50, 0.12)";
+      for (let y = 374; y < H; y += 34) {
+        ctx.fillRect(0, y, W, 2);
+      }
+      for (let x = 22; x < W; x += 78) {
+        ctx.fillRect(x, 360, 2, H - 360);
+      }
+
+      roundRect(ctx, habitat.x - 18, habitat.y + 18, habitat.w + 36, habitat.h + 28, 24, "#fff6df", "#c8945b", 3);
+      ctx.fillStyle = "rgba(255,255,255,0.35)";
+      ctx.fillRect(habitat.x, habitat.y + 42, habitat.w, 190);
+
+      ctx.strokeStyle = "rgba(71, 78, 74, 0.18)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(habitat.x + 16, habitat.y + 232);
+      ctx.lineTo(habitat.x + habitat.w - 16, habitat.y + 232);
+      ctx.stroke();
+
+      ctx.fillStyle = "rgba(65, 64, 45, 0.08)";
+      ctx.beginPath();
+      ctx.ellipse(388, 536, 292, 38, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function drawItems() {
+      drawSprite(4, 0, bowl.x, bowl.y, 0.52, false);
+      drawSprite(4, 1, water.x, water.y, 0.46, false);
+      drawSprite(4, 2, wheel.x, wheel.y, 0.62, false);
+      drawSprite(4, 3, bed.x, bed.y, 0.58, false);
+
+      if (game.foodLevel <= 1) {
+        ctx.fillStyle = "rgba(118, 70, 42, 0.65)";
+        ctx.font = "700 18px system-ui, sans-serif";
+        ctx.fillText("empty", bowl.x - 28, bowl.y - 46);
+      }
+    }
+
+    function drawHamsters() {
+      const sorted = [...game.hamsters].sort((a, b) => a.y - b.y);
+      for (const h of sorted) {
+        const row = h.state === "sleep" ? 3 : h.state === "eat" ? 2 : h.state === "wander" || h.state === "seekFood" || h.state === "play" ? 1 : 0;
+        const scale = h.state === "sleep" ? 0.48 : 0.44;
+        drawSprite(row, h.frame, h.x, h.y, scale, h.facing < 0 && row === 1);
+
+        const barW = 46;
+        const mood = h.fullness < 28 ? "#dd725d" : h.happiness > 72 ? "#72b783" : "#e6ad5f";
+        ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+        roundRect(ctx, h.x - barW / 2, h.y - 104, barW, 7, 4, "rgba(255,255,255,0.82)", "rgba(51,55,48,0.12)", 1);
+        ctx.fillStyle = mood;
+        roundRect(ctx, h.x - barW / 2 + 1, h.y - 103, (barW - 2) * (h.fullness / 100), 5, 3, mood, null, 0);
+      }
+    }
+
+    function drawSprite(row, col, x, y, scale, flip) {
+      const frame = game.frames[row]?.[col % 4];
+      if (!frame) return;
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.scale(flip ? -scale : scale, scale);
+      ctx.drawImage(frame, -ANCHOR_X, -ANCHOR_Y, CELL, CELL);
+      ctx.restore();
+    }
+
+    function drawHud() {
+      roundRect(ctx, 22, 18, 916, 76, 18, "rgba(255, 250, 241, 0.94)", "rgba(44, 60, 55, 0.16)", 2);
+      ctx.fillStyle = "#213630";
+      ctx.font = "800 24px system-ui, sans-serif";
+      ctx.fillText("Hamster Care", 44, 50);
+
+      drawMeter(228, 34, 128, "행복", game.happiness, "#ef9b68");
+      drawMeter(386, 34, 128, "먹이", game.foodLevel, "#78b86d");
+      drawMeter(544, 34, 128, "물", game.waterLevel, "#64a7d8");
+      drawMeter(702, 34, 128, "청결", game.cleanliness, "#b989d6");
+
+      const seconds = Math.max(0, Math.ceil(game.mealCountdown));
+      const mealText = game.mealDue ? "밥 시간" : `다음 밥 ${seconds}s`;
+      ctx.fillStyle = game.mealDue ? "#c84e3f" : "#4d625c";
+      ctx.font = "700 17px system-ui, sans-serif";
+      ctx.fillText(mealText, 808, 64);
+
+      game.buttons = [
+        makeButton(724, 126, 184, 48, "밥 주기", feed, game.mealDue || game.foodLevel < 65),
+        makeButton(724, 186, 184, 48, "물 갈기", fillWater, game.waterLevel < 55),
+        makeButton(724, 246, 184, 48, "놀아주기", play, false),
+        makeButton(724, 306, 184, 48, "청소", clean, game.cleanliness < 52),
+      ];
+      for (const b of game.buttons) drawButton(b);
+
+      roundRect(ctx, 712, 390, 212, 126, 16, "rgba(255, 250, 241, 0.9)", "rgba(44, 60, 55, 0.14)", 2);
+      ctx.fillStyle = "#41544f";
+      ctx.font = "700 16px system-ui, sans-serif";
+      ctx.fillText("상태", 736, 424);
+      ctx.font = "600 14px system-ui, sans-serif";
+      const avgFull = Math.round(game.hamsters.reduce((sum, h) => sum + h.fullness, 0) / game.hamsters.length);
+      const avgEnergy = Math.round(game.hamsters.reduce((sum, h) => sum + h.energy, 0) / game.hamsters.length);
+      ctx.fillText(`포만감 ${avgFull}%`, 736, 454);
+      ctx.fillText(`체력 ${avgEnergy}%`, 736, 482);
+
+      if (game.messageTimer > 0) {
+        const alpha = clamp(game.messageTimer / 0.4, 0, 1);
+        ctx.globalAlpha = alpha;
+        roundRect(ctx, 332, 104, 300, 44, 22, "rgba(45, 63, 56, 0.88)", null, 0);
+        ctx.fillStyle = "#fffaf0";
+        ctx.font = "800 20px system-ui, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(game.message, 482, 133);
+        ctx.textAlign = "left";
+        ctx.globalAlpha = 1;
+      }
+
+      if (game.mode === "loading") {
+        ctx.fillStyle = "rgba(255, 250, 240, 0.86)";
+        ctx.fillRect(0, 0, W, H);
+        ctx.fillStyle = "#243731";
+        ctx.font = "800 28px system-ui, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("로딩 중", W / 2, H / 2);
+        ctx.textAlign = "left";
+      }
+    }
+
+    function makeButton(x, y, w, h, label, action, hot) {
+      return { x, y, w, h, label, action, hot };
+    }
+
+    function drawButton(b) {
+      const hover = game.pointer.x >= b.x && game.pointer.x <= b.x + b.w && game.pointer.y >= b.y && game.pointer.y <= b.y + b.h;
+      const fill = b.hot ? "#f08d62" : hover ? "#ffe2be" : "#fff7e7";
+      const stroke = b.hot ? "#9d4f35" : "rgba(44, 60, 55, 0.2)";
+      roundRect(ctx, b.x, b.y, b.w, b.h, 12, fill, stroke, 2);
+      ctx.fillStyle = b.hot ? "#fffaf0" : "#263a34";
+      ctx.font = "800 18px system-ui, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(b.label, b.x + b.w / 2, b.y + 31);
+      ctx.textAlign = "left";
+    }
+
+    function drawMeter(x, y, w, label, value, color) {
+      ctx.fillStyle = "#586b64";
+      ctx.font = "700 13px system-ui, sans-serif";
+      ctx.fillText(label, x, y - 6);
+      roundRect(ctx, x, y, w, 16, 8, "#e7ded0", "rgba(44,60,55,0.1)", 1);
+      roundRect(ctx, x + 2, y + 2, (w - 4) * clamp(value / 100, 0, 1), 12, 6, color, null, 0);
+    }
+
+    function roundRect(target, x, y, w, h, r, fill, stroke, lineWidth) {
+      target.beginPath();
+      target.moveTo(x + r, y);
+      target.lineTo(x + w - r, y);
+      target.quadraticCurveTo(x + w, y, x + w, y + r);
+      target.lineTo(x + w, y + h - r);
+      target.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      target.lineTo(x + r, y + h);
+      target.quadraticCurveTo(x, y + h, x, y + h - r);
+      target.lineTo(x, y + r);
+      target.quadraticCurveTo(x, y, x + r, y);
+      target.closePath();
+      if (fill) {
+        target.fillStyle = fill;
+        target.fill();
+      }
+      if (stroke) {
+        target.strokeStyle = stroke;
+        target.lineWidth = lineWidth || 1;
+        target.stroke();
+      }
+    }
+
+    function canvasPoint(evt) {
+      const rect = canvas.getBoundingClientRect();
+      return {
+        x: (evt.clientX - rect.left) * (canvas.width / rect.width),
+        y: (evt.clientY - rect.top) * (canvas.height / rect.height),
+      };
+    }
+
+    canvas.addEventListener("pointermove", (evt) => {
+      game.pointer = { ...game.pointer, ...canvasPoint(evt) };
+    });
+
+    canvas.addEventListener("pointerdown", (evt) => {
+      const p = canvasPoint(evt);
+      game.pointer = { x: p.x, y: p.y, down: true };
+      for (const b of game.buttons) {
+        if (p.x >= b.x && p.x <= b.x + b.w && p.y >= b.y && p.y <= b.y + b.h) {
+          b.action();
+          render();
+          return;
+        }
+      }
+    });
+
+    canvas.addEventListener("pointerup", () => {
+      game.pointer.down = false;
+    });
+
+    window.addEventListener("keydown", (evt) => {
+      const key = evt.key.toLowerCase();
+      if (key === "f" || key === " ") feed();
+      if (key === "w") fillWater();
+      if (key === "p" || key === "a") play();
+      if (key === "c") clean();
+      if (key === "r") resetGame();
+      if (key === "enter" && game.mode === "loading") startGame();
+    });
+
+    function resetGame() {
+      game.time = 0;
+      game.day = 1;
+      game.mealCountdown = 24;
+      game.mealDue = false;
+      game.foodLevel = 72;
+      game.waterLevel = 82;
+      game.cleanliness = 88;
+      game.happiness = 76;
+      seed = 20260505;
+      makeHamsters();
+      setMessage("새 집 시작", 2);
+    }
+
+    function startGame() {
+      game.mode = "playing";
+      resetGame();
+      setMessage("햄스터들이 깨어났어요", 2.5);
+      render();
+    }
+
+    function frame(now) {
+      if (!frame.last) frame.last = now;
+      const dt = Math.min(0.05, (now - frame.last) / 1000);
+      frame.last = now;
+      update(dt);
+      render();
+      requestAnimationFrame(frame);
+    }
+
+    function renderGameToText() {
+      const payload = {
+        mode: game.mode,
+        coordinates: "canvas origin top-left, x right, y down",
+        time: Number(game.time.toFixed(1)),
+        mealDue: game.mealDue,
+        mealCountdown: Number(game.mealCountdown.toFixed(1)),
+        resources: {
+          food: Math.round(game.foodLevel),
+          water: Math.round(game.waterLevel),
+          cleanliness: Math.round(game.cleanliness),
+          happiness: Math.round(game.happiness),
+        },
+        hamsters: game.hamsters.map((h) => ({
+          name: h.name,
+          state: h.state,
+          frame: h.frame,
+          spriteRow: h.state === "sleep" ? 3 : h.state === "eat" ? 2 : h.state === "wander" || h.state === "seekFood" || h.state === "play" ? 1 : 0,
+          x: Math.round(h.x),
+          y: Math.round(h.y),
+          fullness: Math.round(h.fullness),
+          thirst: Math.round(h.thirst),
+          energy: Math.round(h.energy),
+          happiness: Math.round(h.happiness),
+        })),
+        buttons: game.buttons.map((b) => ({ label: b.label, x: b.x, y: b.y, w: b.w, h: b.h })),
+        message: game.messageTimer > 0 ? game.message : "",
+      };
+      return JSON.stringify(payload);
+    }
+
+    window.render_game_to_text = renderGameToText;
+    window.advanceTime = (ms) => {
+      const steps = Math.max(1, Math.round(ms / (1000 / 60)));
+      for (let i = 0; i < steps; i += 1) update(1 / 60);
+      render();
+      return renderGameToText();
+    };
+
+    async function boot() {
+      try {
+        render();
+        const img = await loadImage(sheetSrc);
+        game.frames = buildFrames(img);
+        startGame();
+        requestAnimationFrame(frame);
+      } catch (error) {
+        game.mode = "error";
+        game.message = error.message;
+        game.messageTimer = 999;
+        render();
+        console.error(error);
+      }
+    }
+
+    boot();
+  </script>
+</body>
+</html>

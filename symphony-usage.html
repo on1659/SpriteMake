@@ -1,0 +1,961 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SpriteMake Mini-Symphony Usage</title>
+  <style>
+    :root {
+      --bg: #f6f3ec;
+      --panel: #fffdf8;
+      --panel-2: #fbf8f0;
+      --ink: #171717;
+      --muted: #656c73;
+      --line: #d8d0c2;
+      --blue: #2f6f9f;
+      --blue-soft: #e0edf4;
+      --green: #28785b;
+      --green-soft: #e0f0e8;
+      --amber: #966a18;
+      --amber-soft: #f3e6c4;
+      --red: #a74a43;
+      --red-soft: #f2dedb;
+      --violet: #6758a8;
+      --violet-soft: #e7e0f3;
+      --shadow: 0 14px 36px rgba(23, 23, 23, 0.08);
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--sans);
+      letter-spacing: 0;
+      line-height: 1.5;
+    }
+
+    code,
+    pre {
+      font-family: var(--mono);
+    }
+
+    button {
+      font: inherit;
+    }
+
+    a {
+      color: var(--blue);
+      text-underline-offset: 3px;
+      text-decoration-thickness: 1px;
+    }
+
+    .shell {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      border-bottom: 1px solid rgba(23, 23, 23, 0.1);
+      background: rgba(246, 243, 236, 0.94);
+      backdrop-filter: blur(14px);
+    }
+
+    .topbar .shell {
+      min-height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      font-weight: 800;
+    }
+
+    .brand-mark {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border-radius: 7px;
+      background: var(--ink);
+      color: var(--panel);
+      flex: 0 0 auto;
+    }
+
+    .brand-mark svg,
+    .icon svg,
+    .copy-button svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .nav {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 8px 0;
+      scrollbar-width: none;
+    }
+
+    .nav::-webkit-scrollbar {
+      display: none;
+    }
+
+    .nav a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      padding: 7px 10px;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      color: var(--ink);
+      text-decoration: none;
+      white-space: nowrap;
+      font-size: 13px;
+    }
+
+    .nav a:hover,
+    .nav a:focus-visible {
+      border-color: var(--line);
+      background: var(--panel);
+      outline: none;
+    }
+
+    .intro {
+      padding: 36px 0 28px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    .intro-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 0.82fr) minmax(360px, 0.58fr);
+      gap: 28px;
+      align-items: start;
+    }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 780;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 36px;
+      line-height: 1.13;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      margin: 16px 0 0;
+      max-width: 820px;
+      color: #394047;
+      font-size: 17px;
+    }
+
+    .notice {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: 38px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--green);
+      border-radius: 8px;
+      background: #fbfaf5;
+      padding: 14px;
+    }
+
+    .icon {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 7px;
+      background: var(--green-soft);
+      color: var(--green);
+    }
+
+    .notice strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .notice p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .board-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel-2);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .board-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      min-height: 48px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      background: #fffaf0;
+    }
+
+    .board-head strong {
+      font-size: 14px;
+    }
+
+    .board-head span {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+
+    .board-body {
+      padding: 14px;
+    }
+
+    .mini-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #ffffff;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+
+    .mini-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .mini-row strong {
+      display: block;
+      font-size: 14px;
+    }
+
+    .mini-row span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 3px;
+    }
+
+    .state-pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 26px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: var(--blue-soft);
+      color: #185174;
+      font-family: var(--mono);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .state-pill.amber {
+      background: var(--amber-soft);
+      color: #6f4a0d;
+    }
+
+    .state-pill.green {
+      background: var(--green-soft);
+      color: #1c5c45;
+    }
+
+    .section {
+      border-bottom: 1px solid var(--line);
+      padding: 40px 0;
+    }
+
+    .section-heading {
+      display: grid;
+      grid-template-columns: minmax(0, 0.8fr) minmax(260px, 0.64fr);
+      gap: 22px;
+      align-items: end;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 28px;
+      line-height: 1.18;
+      letter-spacing: 0;
+    }
+
+    .section-note {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+    }
+
+    .flow-step {
+      min-height: 190px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      padding: 16px;
+      position: relative;
+    }
+
+    .step-num {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--ink);
+      color: var(--panel);
+      font-family: var(--mono);
+      font-size: 12px;
+      margin-bottom: 12px;
+    }
+
+    .flow-step h3,
+    .command-card h3,
+    .recipe h3,
+    .state-card h3 {
+      margin: 0 0 8px;
+      font-size: 17px;
+      line-height: 1.25;
+    }
+
+    .flow-step p,
+    .recipe p,
+    .state-card p {
+      margin: 0;
+      color: #424951;
+      font-size: 14px;
+    }
+
+    .flow-step code,
+    .recipe code,
+    .state-card code {
+      background: #eee8dc;
+      padding: 2px 5px;
+      border-radius: 5px;
+      overflow-wrap: anywhere;
+    }
+
+    .commands {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .command-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      overflow: hidden;
+    }
+
+    .command-text {
+      padding: 16px 16px 12px;
+    }
+
+    .command-text p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .command-line {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 44px;
+      align-items: stretch;
+      border-top: 1px solid var(--line);
+      background: #1f2426;
+    }
+
+    .command-line code {
+      padding: 14px 16px;
+      color: #fff8ec;
+      font-size: 13px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      min-width: 0;
+    }
+
+    .copy-button {
+      border: 0;
+      border-left: 1px solid rgba(255, 255, 255, 0.12);
+      background: #2d3437;
+      color: #fff8ec;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+    }
+
+    .copy-button:hover,
+    .copy-button:focus-visible {
+      background: #3a4448;
+      outline: none;
+    }
+
+    .copy-button[data-copied="true"] {
+      background: var(--green);
+    }
+
+    .recipes {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .recipe {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      padding: 18px;
+      min-height: 250px;
+    }
+
+    .recipe ul {
+      margin: 14px 0 0;
+      padding-left: 18px;
+      color: #424951;
+      font-size: 14px;
+    }
+
+    .recipe li + li {
+      margin-top: 8px;
+    }
+
+    .state-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+    }
+
+    .state-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      padding: 14px;
+      min-height: 152px;
+    }
+
+    .state-card h3 {
+      font-family: var(--mono);
+      font-size: 13px;
+      overflow-wrap: anywhere;
+    }
+
+    .state-card p {
+      font-size: 13px;
+    }
+
+    .state-card[data-kind="start"] {
+      border-left: 4px solid var(--blue);
+    }
+
+    .state-card[data-kind="work"] {
+      border-left: 4px solid var(--amber);
+    }
+
+    .state-card[data-kind="qa"] {
+      border-left: 4px solid var(--violet);
+    }
+
+    .state-card[data-kind="done"] {
+      border-left: 4px solid var(--green);
+    }
+
+    .do-dont {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .rule-panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      padding: 18px;
+    }
+
+    .rule-panel h3 {
+      margin: 0 0 12px;
+      font-size: 18px;
+    }
+
+    .rule-panel ul {
+      margin: 0;
+      padding-left: 19px;
+      color: #424951;
+      font-size: 14px;
+    }
+
+    .rule-panel li + li {
+      margin-top: 9px;
+    }
+
+    .rule-panel.good {
+      border-left: 4px solid var(--green);
+    }
+
+    .rule-panel.bad {
+      border-left: 4px solid var(--red);
+    }
+
+    .footer {
+      background: var(--ink);
+      color: rgba(255, 253, 248, 0.78);
+      padding: 22px 0;
+      font-size: 13px;
+    }
+
+    .footer .shell {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .footer code {
+      color: #fffdf8;
+    }
+
+    @media (max-width: 980px) {
+      .intro-grid,
+      .section-heading,
+      .do-dont {
+        grid-template-columns: 1fr;
+      }
+
+      .flow {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .commands,
+      .recipes {
+        grid-template-columns: 1fr;
+      }
+
+      .state-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .shell {
+        width: min(100% - 22px, 1180px);
+      }
+
+      .topbar .shell {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .intro {
+        padding-top: 28px;
+      }
+
+      h1 {
+        font-size: 29px;
+      }
+
+      h2 {
+        font-size: 24px;
+      }
+
+      .flow,
+      .state-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .mini-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="shell">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 6h16"></path>
+            <path d="M4 12h10"></path>
+            <path d="M4 18h7"></path>
+          </svg>
+        </span>
+        <span>Mini-Symphony 사용법</span>
+      </div>
+      <nav class="nav" aria-label="페이지 이동">
+        <a href="#flow">흐름</a>
+        <a href="#commands">명령어</a>
+        <a href="#recipes">상황별 사용</a>
+        <a href="#states">상태</a>
+        <a href="#rules">규칙</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="intro">
+      <div class="shell intro-grid">
+        <div>
+          <p class="eyebrow">SpriteMake local orchestration</p>
+          <h1>요청, 프롬프트, 생성 결과, QA를 `output/*` batch 상태로 관리한다.</h1>
+          <p class="lead">
+            Mini-Symphony는 SpriteMake 안의 작업 보드다. 새 스프라이트 요청을 batch로 만들고,
+            생성 전에는 프롬프트 상태를 확인하고, PNG가 들어오면 QA가 필요한지 알려준다.
+          </p>
+          <div class="notice">
+            <span class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 6L9 17l-5-5"></path>
+              </svg>
+            </span>
+            <div>
+              <strong>안전한 역할만 한다</strong>
+              <p>이미지 API를 호출하지 않고, API key를 저장하지 않고, QA 전 PNG를 `final/`로 옮기지 않는다.</p>
+            </div>
+          </div>
+        </div>
+
+        <aside class="board-card" aria-label="현재 보드 예시">
+          <div class="board-head">
+            <strong>현재 보드 예시</strong>
+            <span>output/SYMPHONY.md</span>
+          </div>
+          <div class="board-body">
+            <div class="mini-row">
+              <div>
+                <strong>bridge-cross</strong>
+                <span>generated PNG 3개, final PNG 2개</span>
+              </div>
+              <span class="state-pill amber">needs-refine</span>
+            </div>
+            <div class="mini-row">
+              <div>
+                <strong>다음 액션</strong>
+                <span>REQUESTS.md의 TBD/빈 runtime 필드 정리</span>
+              </div>
+              <span class="state-pill">refine</span>
+            </div>
+            <div class="mini-row">
+              <div>
+                <strong>리포트 갱신</strong>
+                <span>`-WriteReport`로 이 상태를 다시 쓴다</span>
+              </div>
+              <span class="state-pill green">safe</span>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="flow" class="section">
+      <div class="shell">
+        <div class="section-heading">
+          <h2>기본 흐름</h2>
+          <p class="section-note">사용자는 짧게 말하고, SpriteMake는 batch 폴더와 상태 리포트로 일을 정리한다.</p>
+        </div>
+        <div class="flow">
+          <article class="flow-step">
+            <div class="step-num">1</div>
+            <h3>요청 받기</h3>
+            <p>예: “불/얼음 드래곤 스프라이트 만들어줘.” 긴 템플릿을 먼저 요구하지 않는다.</p>
+          </article>
+          <article class="flow-step">
+            <div class="step-num">2</div>
+            <h3>batch 생성</h3>
+            <p><code>sprite-intake.ps1</code>가 <code>output/{name}-{timestamp}</code>와 기본 MD 파일을 만든다.</p>
+          </article>
+          <article class="flow-step">
+            <div class="step-num">3</div>
+            <h3>상태 스캔</h3>
+            <p><code>symphony.ps1</code>가 prompt, generated, final, QA 상태를 읽고 다음 액션을 제안한다.</p>
+          </article>
+          <article class="flow-step">
+            <div class="step-num">4</div>
+            <h3>외부 생성/QA</h3>
+            <p><code>gpt-image-2</code> 프롬프트를 외부에서 사용하고, 받은 PNG는 먼저 <code>generated/</code>에 둔다.</p>
+          </article>
+          <article class="flow-step">
+            <div class="step-num">5</div>
+            <h3>final 후보</h3>
+            <p>QA 통과 후에만 <code>final/</code> 후보가 되고, 사람이 게임 프로젝트 이동 여부를 본다.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="commands" class="section">
+      <div class="shell">
+        <div class="section-heading">
+          <h2>명령어</h2>
+          <p class="section-note">오른쪽 버튼을 누르면 명령어를 복사한다. PowerShell에서 프로젝트 루트 기준으로 실행한다.</p>
+        </div>
+        <div class="commands">
+          <article class="command-card">
+            <div class="command-text">
+              <h3>새 자연어 요청 받기</h3>
+              <p>사용자 요청을 저장하고 batch scaffold와 `PROMPT.md`를 만든다.</p>
+            </div>
+            <div class="command-line">
+              <code>.\.agents\hooks\sprite-intake.ps1 -Request "드래곤 스프라이트 그려줘. 불속성과 얼음속성 두 종류가 있어야 해."</code>
+              <button class="copy-button" type="button" data-copy='.\.agents\hooks\sprite-intake.ps1 -Request "드래곤 스프라이트 그려줘. 불속성과 얼음속성 두 종류가 있어야 해."' aria-label="명령어 복사">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M8 8h11v11H8z"></path><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"></path>
+                </svg>
+              </button>
+            </div>
+          </article>
+
+          <article class="command-card">
+            <div class="command-text">
+              <h3>현재 보드 보기</h3>
+              <p>`output/*` batch를 스캔해서 상태와 다음 액션을 터미널에 보여준다.</p>
+            </div>
+            <div class="command-line">
+              <code>.\.agents\hooks\symphony.ps1</code>
+              <button class="copy-button" type="button" data-copy=".\.agents\hooks\symphony.ps1" aria-label="명령어 복사">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M8 8h11v11H8z"></path><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"></path>
+                </svg>
+              </button>
+            </div>
+          </article>
+
+          <article class="command-card">
+            <div class="command-text">
+              <h3>상태 리포트 저장</h3>
+              <p>`output/SYMPHONY.md`를 갱신한다. 작업 넘기기 전에 가장 자주 쓴다.</p>
+            </div>
+            <div class="command-line">
+              <code>.\.agents\hooks\symphony.ps1 -WriteReport</code>
+              <button class="copy-button" type="button" data-copy=".\.agents\hooks\symphony.ps1 -WriteReport" aria-label="명령어 복사">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M8 8h11v11H8z"></path><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"></path>
+                </svg>
+              </button>
+            </div>
+          </article>
+
+          <article class="command-card">
+            <div class="command-text">
+              <h3>자동화용 JSON</h3>
+              <p>다른 runner나 스크립트가 batch 상태를 읽을 때 쓴다.</p>
+            </div>
+            <div class="command-line">
+              <code>.\.agents\hooks\symphony.ps1 -Json</code>
+              <button class="copy-button" type="button" data-copy=".\.agents\hooks\symphony.ps1 -Json" aria-label="명령어 복사">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M8 8h11v11H8z"></path><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"></path>
+                </svg>
+              </button>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="recipes" class="section">
+      <div class="shell">
+        <div class="section-heading">
+          <h2>상황별 사용법</h2>
+          <p class="section-note">Mini-Symphony는 직접 문제를 해결하기보다, 지금 어디서 막혔는지 짚어준다.</p>
+        </div>
+        <div class="recipes">
+          <article class="recipe">
+            <h3>새 스프라이트를 시작할 때</h3>
+            <p>먼저 intake를 돌리고, 바로 board를 확인한다.</p>
+            <ul>
+              <li><code>sprite-intake.ps1</code> 실행</li>
+              <li><code>symphony.ps1</code>로 상태 확인</li>
+              <li><code>needs-refine</code>이면 REQUESTS/PROMPT 보강</li>
+            </ul>
+          </article>
+          <article class="recipe">
+            <h3>외부 생성 전에</h3>
+            <p>프롬프트가 안전하게 준비됐는지 본다.</p>
+            <ul>
+              <li><code>prompt-ready</code>인지 확인</li>
+              <li><code>gpt-image-2</code> generation target 확인</li>
+              <li>anchor, baseline, grid가 빠졌으면 보강</li>
+            </ul>
+          </article>
+          <article class="recipe">
+            <h3>PNG를 받은 뒤</h3>
+            <p>받은 파일은 바로 final이 아니다.</p>
+            <ul>
+              <li>PNG를 <code>generated/</code>에 둔다</li>
+              <li><code>symphony.ps1</code>로 <code>qa-needed</code> 확인</li>
+              <li>QA 통과 후에만 <code>final/</code> 후보로 둔다</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="states" class="section">
+      <div class="shell">
+        <div class="section-heading">
+          <h2>상태 의미</h2>
+          <p class="section-note">상태는 “좋다/나쁘다”가 아니라 다음 작업을 고르는 신호다.</p>
+        </div>
+        <div class="state-grid">
+          <article class="state-card" data-kind="start">
+            <h3>needs-scaffold</h3>
+            <p>표준 MD나 폴더가 빠졌다. `new-batch.ps1` 또는 수동 정리가 필요하다.</p>
+          </article>
+          <article class="state-card" data-kind="start">
+            <h3>needs-prompt</h3>
+            <p>`PROMPT.md`가 없거나 비어 있다. copy-ready prompt를 만들어야 한다.</p>
+          </article>
+          <article class="state-card" data-kind="work">
+            <h3>needs-prompt-inject</h3>
+            <p>`gpt-image-2` generation target이 빠졌다. `prompt-inject.ps1`를 쓴다.</p>
+          </article>
+          <article class="state-card" data-kind="work">
+            <h3>needs-refine</h3>
+            <p>target path, grid/cell, anchor, baseline, TBD가 남아 있다.</p>
+          </article>
+          <article class="state-card" data-kind="work">
+            <h3>prompt-ready</h3>
+            <p>외부 `gpt-image-2` 환경에 붙여 넣을 준비가 됐다.</p>
+          </article>
+          <article class="state-card" data-kind="qa">
+            <h3>qa-needed</h3>
+            <p>`generated/`에 PNG가 있다. size, alpha, bbox, preview를 검수한다.</p>
+          </article>
+          <article class="state-card" data-kind="qa">
+            <h3>needs-regeneration</h3>
+            <p>QA 실패가 기록됐다. 실패본은 `generated/`에 두고 재생성 노트를 쓴다.</p>
+          </article>
+          <article class="state-card" data-kind="qa">
+            <h3>mixed-review</h3>
+            <p>`final/`에 PNG가 있지만 QA 실패도 있다. 통합 전 사람이 확인해야 한다.</p>
+          </article>
+          <article class="state-card" data-kind="done">
+            <h3>final-review</h3>
+            <p>`final/` 파일은 있지만 QA pass 기록이 더 명확해야 한다.</p>
+          </article>
+          <article class="state-card" data-kind="done">
+            <h3>final-candidate</h3>
+            <p>QA 통과 상태다. target path를 확인한 뒤 게임 프로젝트 이동을 검토한다.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="rules" class="section">
+      <div class="shell">
+        <div class="section-heading">
+          <h2>운영 규칙</h2>
+          <p class="section-note">이 규칙이 SpriteMake를 이미지 생성 폴더가 아니라 게임 리소스 제작 시스템으로 유지한다.</p>
+        </div>
+        <div class="do-dont">
+          <article class="rule-panel good">
+            <h3>해야 할 것</h3>
+            <ul>
+              <li>짧은 요청은 먼저 `sprite-intake.ps1`로 batch화한다.</li>
+              <li>외부 생성 전 `symphony.ps1`로 `prompt-ready`인지 확인한다.</li>
+              <li>generated PNG는 먼저 `generated/`에 둔다.</li>
+              <li>anchor와 Y-axis baseline/source plane을 항상 분리해서 쓴다.</li>
+              <li>handoff 전 `symphony.ps1 -WriteReport`로 `output/SYMPHONY.md`를 갱신한다.</li>
+            </ul>
+          </article>
+          <article class="rule-panel bad">
+            <h3>하면 안 되는 것</h3>
+            <ul>
+              <li>이 프로젝트에 API key를 저장하지 않는다.</li>
+              <li>SpriteMake가 이미지 생성 API를 직접 호출하게 만들지 않는다.</li>
+              <li>QA 전 PNG를 `final/`로 옮기지 않는다.</li>
+              <li>`gpt-image-2` 요구를 빼거나 다른 모델로 조용히 대체하지 않는다.</li>
+              <li>loose contact sheet를 final asset으로 취급하지 않는다.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="shell">
+      <div>Usage guide for <code>D:\Work\vibe\SpriteMake</code></div>
+      <div>관련 문서: <code>WORKFLOW.md</code>, <code>.agents/hooks/README.md</code>, <code>output/SYMPHONY.md</code></div>
+    </div>
+  </footer>
+
+  <script>
+    const copyButtons = document.querySelectorAll("[data-copy]");
+
+    function fallbackCopy(text) {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.setAttribute("readonly", "");
+      textarea.style.position = "fixed";
+      textarea.style.left = "-9999px";
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
+    }
+
+    copyButtons.forEach((button) => {
+      button.addEventListener("click", async () => {
+        const text = button.getAttribute("data-copy");
+        try {
+          if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(text);
+          } else {
+            fallbackCopy(text);
+          }
+          button.dataset.copied = "true";
+          window.setTimeout(() => {
+            button.dataset.copied = "false";
+          }, 900);
+        } catch (error) {
+          fallbackCopy(text);
+          button.dataset.copied = "true";
+          window.setTimeout(() => {
+            button.dataset.copied = "false";
+          }, 900);
+        }
+      });
+    });
+  </script>
+</body>
+</html>

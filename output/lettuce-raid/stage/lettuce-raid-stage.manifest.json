@@ -1,0 +1,185 @@
+﻿{
+  "version": 1,
+  "game": "lettuce-raid",
+  "generatedAt": "2026-04-29",
+  "source": "C:/Users/user/Downloads/ChatGPT Image 2026-04-29 12_42_51.png",
+  "notes": [
+    "Background selected from the user downloaded ChatGPT web UI result.",
+    "This stage is intended to use individual lettuce sprites placed by code, not a baked lettuce field.",
+    "The guide image is dev-only and should not be used as the runtime background."
+  ],
+  "stage": {
+    "image": "stage-background-v1.png",
+    "sourceImage": "stage-background-source-v1.png",
+    "guideImage": "stage-background-guide-v1.png",
+    "size": {
+      "width": 960,
+      "height": 640
+    },
+    "sourceSize": {
+      "width": 1536,
+      "height": 1024
+    },
+    "aspectRatio": "3:2",
+    "recommendedCss": "width: 100%; aspect-ratio: 3 / 2; object-fit: cover;",
+    "startZone": {
+      "polygon": [
+        [
+          0,
+          322
+        ],
+        [
+          210,
+          306
+        ],
+        [
+          338,
+          364
+        ],
+        [
+          448,
+          518
+        ],
+        [
+          360,
+          640
+        ],
+        [
+          0,
+          640
+        ]
+      ],
+      "spawnPoints": [
+        [
+          108,
+          474
+        ],
+        [
+          170,
+          440
+        ],
+        [
+          240,
+          398
+        ],
+        [
+          302,
+          378
+        ]
+      ],
+      "meaning": "Lower-left open area for player spawn/waiting."
+    },
+    "roadRoute": {
+      "type": "polyline",
+      "points": [
+        [
+          334,
+          0
+        ],
+        [
+          276,
+          112
+        ],
+        [
+          244,
+          230
+        ],
+        [
+          282,
+          348
+        ],
+        [
+          418,
+          500
+        ],
+        [
+          548,
+          640
+        ]
+      ],
+      "meaning": "Main curved dirt-road movement path toward the lettuce field."
+    },
+    "lettuceFieldArea": {
+      "polygon": [
+        [
+          372,
+          14
+        ],
+        [
+          960,
+          0
+        ],
+        [
+          960,
+          392
+        ],
+        [
+          760,
+          408
+        ],
+        [
+          586,
+          384
+        ],
+        [
+          430,
+          320
+        ],
+        [
+          360,
+          164
+        ]
+      ],
+      "suggestedGrid": {
+        "rows": 6,
+        "cols": 8,
+        "notes": "Use this only as a starting estimate; tune placements after lettuce sprite scale is finalized."
+      },
+      "meaning": "Empty fenced field where individual lettuce sprites can be placed."
+    },
+    "npcWatchArea": {
+      "polygon": [
+        [
+          352,
+          44
+        ],
+        [
+          470,
+          18
+        ],
+        [
+          610,
+          58
+        ],
+        [
+          544,
+          136
+        ],
+        [
+          410,
+          134
+        ]
+      ],
+      "watchPoint": [
+        470,
+        92
+      ],
+      "patrolPoints": [
+        [
+          424,
+          92
+        ],
+        [
+          506,
+          74
+        ],
+        [
+          560,
+          108
+        ]
+      ],
+      "meaning": "Optional upper-side guard/watch space."
+    }
+  }
+}
+

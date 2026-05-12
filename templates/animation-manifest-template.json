@@ -1,0 +1,29 @@
+﻿{
+  "sheets": {
+    "main": {
+      "label": "Main Sprite Atlas",
+      "image": "../assets/characters/player-atlas.png",
+      "grid": {
+        "columns": 4,
+        "rows": 6
+      },
+      "anchor": {
+        "x": 192,
+        "y": 252,
+        "mode": "pixel"
+      },
+      "baselineY": 252,
+      "defaultScale": 1,
+      "animations": {
+        "idle": {
+          "row": 0,
+          "frames": [0, 1, 2, 3],
+          "fps": 8,
+          "loop": true
+        }
+      }
+    }
+  }
+}
+
+

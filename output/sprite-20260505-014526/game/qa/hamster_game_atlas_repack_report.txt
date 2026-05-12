@@ -1,0 +1,35 @@
+hamster_game_atlas.png
+source: D:\Work\vibe\SpriteMake\output\sprite-20260505-014526\game\assets\hamster_2d_sheet_source.png
+output: D:\Work\vibe\SpriteMake\output\sprite-20260505-014526\game\assets\hamster_game_atlas.png
+canvas: 1024x1280
+grid: 4x5
+cell: 256x256
+anchor: x=128, y=226
+
+row 0 col 0: source_bbox=(150, 34, 334, 249) paste_bbox=(46, 34, 210, 226) size=(164, 192) scale=0.893
+row 0 col 1: source_bbox=(91, 36, 272, 249) paste_bbox=(47, 34, 210, 226) size=(163, 192) scale=0.9014
+row 0 col 2: source_bbox=(51, 33, 232, 249) paste_bbox=(48, 34, 209, 226) size=(161, 192) scale=0.8889
+row 0 col 3: source_bbox=(38, 33, 215, 249) paste_bbox=(50, 34, 207, 226) size=(157, 192) scale=0.8889
+row 1 col 0: source_bbox=(136, 5, 326, 226) paste_bbox=(51, 46, 206, 226) size=(155, 180) scale=0.8145
+row 1 col 1: source_bbox=(62, 8, 269, 226) paste_bbox=(43, 46, 214, 226) size=(171, 180) scale=0.8257
+row 1 col 2: source_bbox=(28, 10, 235, 226) paste_bbox=(42, 46, 214, 226) size=(172, 180) scale=0.8333
+row 1 col 3: source_bbox=(38, 10, 228, 226) paste_bbox=(49, 46, 207, 226) size=(158, 180) scale=0.8333
+row 2 col 0: source_bbox=(144, 0, 312, 202) paste_bbox=(49, 36, 207, 226) size=(158, 190) scale=0.9406
+row 2 col 1: source_bbox=(89, 0, 259, 203) paste_bbox=(49, 36, 208, 226) size=(159, 190) scale=0.936
+row 2 col 2: source_bbox=(51, 0, 222, 203) paste_bbox=(48, 36, 208, 226) size=(160, 190) scale=0.936
+row 2 col 3: source_bbox=(45, 0, 214, 204) paste_bbox=(50, 36, 207, 226) size=(157, 190) scale=0.9314
+row 3 col 0: source_bbox=(114, 2, 335, 158) paste_bbox=(35, 94, 222, 226) size=(187, 132) scale=0.8462
+row 3 col 1: source_bbox=(48, 3, 278, 182) paste_bbox=(43, 94, 213, 226) size=(170, 132) scale=0.7374
+row 3 col 2: source_bbox=(9, 1, 320, 182) paste_bbox=(33, 115, 223, 226) size=(190, 111) scale=0.6109
+row 3 col 3: source_bbox=(8, 3, 242, 159) paste_bbox=(33, 99, 223, 226) size=(190, 127) scale=0.812
+row 4 col 0: source_bbox=(118, 54, 340, 211) paste_bbox=(49, 114, 207, 226) size=(158, 112) scale=0.7134
+row 4 col 1: source_bbox=(111, 0, 265, 215) paste_bbox=(77, 84, 179, 226) size=(102, 142) scale=0.6623
+row 4 col 2: source_bbox=(14, 0, 320, 230) paste_bbox=(45, 101, 211, 226) size=(166, 125) scale=0.5425
+row 4 col 3: source_bbox=(9, 10, 248, 222) paste_bbox=(48, 84, 208, 226) size=(160, 142) scale=0.6698
+
+full alpha bbox: (35, 34, 991, 1250)
+row 0: 0:(46, 34, 210, 226) 1:(47, 34, 210, 226) 2:(48, 34, 209, 226) 3:(50, 34, 207, 226)
+row 1: 0:(51, 46, 206, 226) 1:(43, 46, 214, 226) 2:(42, 46, 214, 226) 3:(49, 46, 207, 226)
+row 2: 0:(49, 36, 207, 226) 1:(49, 36, 208, 226) 2:(48, 36, 208, 226) 3:(50, 36, 207, 226)
+row 3: 0:(35, 94, 222, 226) 1:(43, 94, 213, 226) 2:(33, 115, 223, 226) 3:(33, 99, 223, 226)
+row 4: 0:(49, 114, 207, 226) 1:(77, 84, 179, 226) 2:(45, 101, 211, 226) 3:(48, 84, 208, 226)
