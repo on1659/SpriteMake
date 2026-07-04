@@ -215,6 +215,24 @@ Resource Request Brief:
 4. HTML 툴에서 sheet/animation/FPS/scale을 바꿔 보며 프레임 튐과 크롭 문제를 확인한다.
 ```
 
+`templates/animation-player-template.html` 자체는 빈 원본입니다. 실제 리소스 검수용으로 사용자에게 열어주거나 안내할 파일은 batch별로 적용된 파일입니다.
+
+```text
+output/{batch}/tools/animation-preview.html
+```
+
+Preview tool은 더블클릭 실행을 기본 품질선으로 둡니다.
+
+```text
+Standalone Preview Rule:
+- animation-preview.html은 file://로 직접 열어도 작동해야 한다.
+- 로컬 HTTP 서버가 있어야만 manifest/image를 읽는 구조로 만들지 않는다.
+- file://에서 fetch()나 canvas pixel read가 막히면 manifest와 현재 PNG 후보를 HTML 안에 내장하거나 data URL fallback을 둔다.
+- HTTP 서버로 열 때는 내장본보다 실제 project-relative 파일 경로를 우선해서, regenerated PNG를 바로 확인할 수 있게 한다.
+- 페이지가 열리면 기본 manifest를 자동 load하고 첫 sheet를 바로 보여준다.
+- 최종 검증은 실제 브라우저에서 ready=true, canvas nonblank, console error 0, bbox가 pixel-read-blocked가 아닌 상태로 확인한다.
+```
+
 문서나 요청서에는 임시 참고 파일의 로컬 절대 경로를 쓰지 않습니다. 복사 가능한 템플릿과 제작 방식만 남깁니다.
 
 ## 2. Strict Atlas로 만든다
@@ -457,6 +475,9 @@ Animation Preview Tool:
 - Tool output path: {ANIMATION_TOOL_PATH}
 - Preview manifest path: {ANIMATION_MANIFEST_PATH}
 - The tool must play each row/frame, show the full sheet grid, selected frame, contact anchor, Y-axis baseline/source plane, image size, cell size, alpha bbox, and path metadata.
+- The tool must work by double-clicking the HTML file under `file://`; embed manifest/image data URL fallback when needed.
+- The tool must auto-load the default manifest on page open.
+- Verify in a real browser: ready=true, visible nonblank canvas, no console errors, and alpha bbox not blocked by file:// security.
 - Use project-relative or user-configurable paths. Do not hardcode machine-specific source paths.
 ```
 

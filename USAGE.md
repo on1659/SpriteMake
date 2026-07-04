@@ -263,6 +263,12 @@ Anchor는 가능하면 pixel 좌표로 적습니다.
 templates/animation-player-template.html
 ```
 
+주의: 위 파일은 빈 템플릿입니다. 실제 스프라이트 확인은 batch별 adapted tool을 엽니다.
+
+```text
+output/{batch}/tools/animation-preview.html
+```
+
 사용 방식:
 
 1. 이 HTML을 batch의 `tools/` 또는 게임 프로젝트의 도구 폴더로 복사한다.
@@ -270,6 +276,14 @@ templates/animation-player-template.html
 3. 필요하면 `Project Root`를 채워 로컬 path 표시를 확인한다.
 4. sheet, animation, palette, FPS, scale을 바꿔 본다.
 5. full sheet grid, selected frame, contact anchor, Y baseline을 확인한다.
+
+필수 실행 규칙:
+
+- 사용자가 HTML을 더블클릭해 `file://`로 열어도 기본 sheet가 자동으로 떠야 한다.
+- 로컬 서버가 없다는 이유만으로 preview가 비어 있으면 실패다.
+- 브라우저가 `file://`에서 `fetch()` 또는 canvas pixel read를 막는 경우, manifest와 현재 PNG 후보를 HTML에 내장하거나 data URL fallback을 넣는다.
+- 단, 로컬 HTTP 서버로 열 때는 실제 `generated/` 또는 `final/` 파일을 읽도록 project-relative path를 우선한다.
+- `Load` 버튼은 수동 재로드/다른 manifest 선택용으로 남기되, 최초 확인에 필수이면 안 된다.
 
 이 툴에서 봐야 하는 것:
 
@@ -302,6 +316,9 @@ templates/asset-qa-checklist.md
 - 투명 모서리가 깨끗한가?
 - per-cell alpha bbox가 기록됐는가?
 - animation preview tool에서 재생 확인했는가?
+- animation preview tool을 file://로 직접 열었을 때 자동 로드되는가?
+- file://에서도 alpha bbox가 `pixel read blocked`가 아니라 실제 bbox로 표시되는가?
+- 브라우저 콘솔 에러가 0개인가?
 ```
 
 ## 8. 게임 프로젝트로 옮기기

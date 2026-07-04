@@ -131,6 +131,11 @@ Animation Preview Tool Request:
 - Preview manifest path:
 - The tool must load the target PNG through the manifest, play each animation row/frame, expose sheet/animation/palette/FPS/scale controls, and show both an animation stage and the full sprite sheet.
 - The tool must draw exact cell grid lines, selected frame bounds, contact anchor, Y-axis baseline/source plane, image size, cell size, alpha bbox, and path metadata.
+- The tool must work when opened directly through `file://` by double-clicking the HTML file.
+- The tool must auto-load the default manifest on page open.
+- If browser `file://` security blocks manifest/image fetch or canvas pixel reads, embed the manifest and current PNG candidates as data URL fallback in the adapted tool.
+- When opened through a local HTTP server, prefer project-relative manifest/image paths so regenerated PNG files are read from disk.
+- Before handoff, verify in a real browser: `ready: true`, nonblank canvases, no console errors, and alpha bbox is not blocked.
 - Use project-relative or user-configurable paths in the tool. Do not hardcode machine-specific source paths.
 ```
 
@@ -183,6 +188,9 @@ After generation, verify:
 - Alpha, bbox, and transparent corners are clean.
 - The animation preview tool loads the manifest and PNG.
 - The animation preview tool can play every intended row/frame.
+- The animation preview tool works by double-clicking the HTML file under `file://`.
+- The animation preview tool auto-loads the default sheet and has no browser console errors.
+- Alpha bbox display works under `file://` or the tool clearly uses an embedded/data URL fallback to make it work.
 
 ## 6. Integration
 

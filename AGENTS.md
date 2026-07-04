@@ -251,6 +251,24 @@ Animated atlases should have a local HTML preview tool.
 
 Use `templates/animation-player-template.html` as the starting point.
 
+Do not hand the template path to the user as the actual preview for a sprite batch. The template is intentionally empty. For real QA, hand off the adapted batch file:
+
+```text
+output/{batch}/tools/animation-preview.html
+```
+
+Preview tools must be usable by double-clicking the HTML file.
+
+Rules:
+
+- Do not require a local HTTP server just to inspect a generated sprite.
+- The adapted tool must work under `file://` with no external network, API key, or app server.
+- For `file://` mode, embed or otherwise inline the preview manifest and the current PNG candidates as data URLs when browser security would block `fetch()` or canvas pixel reads.
+- For local HTTP/server mode, prefer project-relative manifest and image paths so regenerated PNG files are read from disk.
+- Auto-load the default manifest on page open; do not require the user to press `Load` before seeing the first sheet.
+- Keep a manual `Load` button for alternate manifests.
+- Verify with a real browser that `file://.../animation-preview.html` reaches `ready: true`, shows a nonblank canvas, has no console errors, and does not show `pixel read blocked on file://` for alpha bbox.
+
 The preview tool should verify:
 
 - manifest loading

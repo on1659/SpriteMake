@@ -61,6 +61,11 @@ Use this for sprite atlases with animation frames.
 - The full sheet view shows exact grid lines, selected frame bounds, contact anchors, and Y-axis baseline/source plane.
 - The stage preview makes row-to-row drift, crop errors, and anchor mistakes visible.
 - Tool paths are project-relative or user-configurable, not hardcoded to a temporary local source path.
+- The tool works when opened directly as `file://.../animation-preview.html`.
+- The default manifest auto-loads on page open; the first sheet is visible without pressing `Load`.
+- If `file://` blocks `fetch()` or canvas pixel reads, the adapted tool embeds the manifest and current PNG candidates as data URL fallback.
+- When served over local HTTP, the tool reads project-relative manifest/image files so regenerated PNGs are reflected.
+- Browser verification reports `ready: true`, nonblank canvases, console error count `0`, and alpha bbox is not `pixel read blocked on file://`.
 
 ## Alpha BBox
 
@@ -125,6 +130,8 @@ Asset QA Report:
 - Plane alignment result:
 - Issues found:
 - Code offset required:
+- Preview file:// result:
+- Preview console errors:
 ```
 
 

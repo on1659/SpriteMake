@@ -36,6 +36,16 @@
 Strict atlas + exact grid + cell boundaries + contact anchor + Y-axis baseline + alpha QA + animation preview.
 ```
 
+Preview tool 운영 규칙:
+
+- `templates/animation-player-template.html`은 빈 원본이다. 실제 리소스 확인 경로로 안내할 때는 `output/{batch}/tools/animation-preview.html` 같은 adapted batch tool을 안내한다.
+- 새 animation/preview HTML tool은 더블클릭 `file://` 단독 실행을 지원해야 한다.
+- 서버가 필요한 도구는 보조 경로로만 허용한다. 기본 QA 경로가 “서버 켜기”이면 실패다.
+- `file://`에서 manifest `fetch()` 또는 canvas pixel read가 막히면 adapted tool에 manifest와 PNG data URL fallback을 내장한다.
+- HTTP 서버로 열 때는 실제 project-relative 파일을 우선해서 regenerated PNG 확인이 가능해야 한다.
+- 페이지 open 시 기본 manifest를 자동 load하고 첫 sheet를 보여준다.
+- 검증은 실제 브라우저로 `ready=true`, nonblank canvas, console error 0, bbox 표시 정상까지 확인한다.
+
 ## 현재 파일 구조
 
 ```text
@@ -325,6 +335,7 @@ QA 통과 전 파일은 실제 게임 프로젝트의 production asset으로 취
 
 - `mockup.html` script syntax check passed with Node.
 - `templates/animation-player-template.html` script syntax check passed with Node.
+- Adapted animation preview tools must also be browser-tested under `file://` for auto-load, nonblank canvas, clean console, and readable alpha bbox.
 - `templates/animation-manifest-template.json` parses as JSON.
 - `.agents/hooks/preflight.ps1` passed.
 - `.agents/hooks/symphony.ps1` scans output batches and can write `output/SYMPHONY.md`.

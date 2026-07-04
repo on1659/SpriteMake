@@ -72,6 +72,17 @@
       font-size: 13px;
     }
 
+    .template-notice {
+      margin: 10px 0 0;
+      padding: 9px 10px;
+      border: 1px solid rgba(255, 213, 106, 0.42);
+      border-radius: 7px;
+      background: rgba(255, 213, 106, 0.1);
+      color: var(--gold);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
     .controls {
       display: flex;
       gap: 10px;
@@ -239,6 +250,10 @@
       <div>
         <h1>Sprite Animation Player</h1>
         <p class="subtitle">strict atlas 재생, 크롭, 앵커, Y baseline 확인용 로컬 툴</p>
+        <p class="template-notice" id="templateNotice">
+          This file is the empty template. For real sprite QA, open the adapted batch tool under
+          output/{batch}/tools/animation-preview.html, or inject a manifest and PNG data URLs into this copy.
+        </p>
       </div>
       <div class="controls">
         <label class="path">
@@ -307,6 +322,7 @@
   </main>
 
   <script id="embeddedManifest" type="application/json">{}</script>
+  <script id="embeddedImages" type="application/json">{}</script>
 
   <script>
     (() => {
@@ -365,7 +381,20 @@
         return parsed && parsed.sheets ? parsed : null;
       }
 
+      function embeddedImages() {
+        const node = document.getElementById("embeddedImages");
+        if (!node || !node.textContent.trim()) return {};
+        try {
+          return JSON.parse(node.textContent) || {};
+        } catch {
+          return {};
+        }
+      }
+
+      const embeddedImageMap = embeddedImages();
+
       function imageUrl(path) {
+        if (location.protocol === "file:" && embeddedImageMap[path]) return { href: embeddedImageMap[path] };
         const url = new URL(path, state.manifestUrl);
         url.searchParams.set("v", assetRevision);
         return url;
@@ -644,7 +673,7 @@
       }
 
       function step(ms) {
-        if (!state.manifest || !state.playing) {
+        if (!state.manifest || !state.sheetId || !state.animId || !state.playing) {
           render();
           return;
         }
@@ -742,15 +771,26 @@
             state.manifest = inlineManifest;
             setStatus("loaded embedded manifest for file:// preview");
           } else {
+            const defaultTemplateManifest = (els.manifestInput.value.trim() || "sprite-manifest.json") === "sprite-manifest.json";
+            if (location.protocol === "file:" && !inlineManifest && defaultTemplateManifest) {
+              setStatus("Template only: no embedded manifest/images. Open an adapted batch tool from output/{batch}/tools/animation-preview.html, or enter a real manifest path and press Load.", "bad");
+              return;
+            }
             const res = await fetch(state.manifestUrl.href, { cache: "no-store" });
             if (!res.ok) throw new Error(`manifest load failed: ${res.status}`);
             state.manifest = await res.json();
           }
           await loadAllImages();
           populateControls();
+          const notice = document.getElementById("templateNotice");
+          if (notice) notice.style.display = "none";
         } catch (error) {
           console.error(error);
-          setStatus(error.message, "bad");
+          const expectedEmptyTemplate = location.protocol === "file:" && !embeddedManifest();
+          const message = expectedEmptyTemplate
+            ? "Template only: no embedded manifest/images. Open an adapted batch tool from output/{batch}/tools/animation-preview.html, or enter a real manifest path and press Load."
+            : error.message;
+          setStatus(message, "bad");
         }
       }
 
@@ -811,6 +851,7 @@
         });
       };
 
+      loadManifest();
       requestAnimationFrame(tick);
     })();
   </script>
