@@ -31,6 +31,8 @@ Related mockup:
 GUI:
 
 - [start-symphony-gui.bat](./start-symphony-gui.bat)
+- [start-symphony-gui.sh](./start-symphony-gui.sh)
+- [start-symphony-gui_mac.command](./start-symphony-gui_mac.command)
 - [tools/symphony-gui/](./tools/symphony-gui/)
 
 GUI runtime files:
@@ -38,6 +40,15 @@ GUI runtime files:
 - `output/SYMPHONY-GUI.url`: last opened local dashboard URL
 - `output/SYMPHONY-GUI.json`: host/port/start metadata
 - `output/SYMPHONY-GUI.log`: live JSONL scan/server log shown in the GUI
+
+Local Runner foundation:
+
+- [tools/runner/README.md](./tools/runner/README.md)
+- [templates/asset-contract-template.json](./templates/asset-contract-template.json)
+
+The Runner keeps candidate generation, automated QA, required human review, and
+atomic `final/` promotion separate. It records checksums so a candidate or QA
+report changed after approval cannot be promoted silently.
 
 Related templates:
 
@@ -173,7 +184,7 @@ output/SYMPHONY.md
 .\start-symphony-gui.bat
 ```
 
-이 BAT는 Node.js 서버를 시작하고 빈 로컬 포트를 자동으로 선택합니다. 실행 후 URL은 브라우저로 열리며, `output/SYMPHONY-GUI.url`에도 저장됩니다. 명령은 계속 Codex 채팅이나 PowerShell에서 내리고, GUI는 읽기 전용 진행도 확인 화면으로 사용합니다.
+이 런처는 Node.js 서버를 시작하고 빈 로컬 포트를 자동으로 선택합니다. 실행 후 URL은 브라우저로 열리며, `output/SYMPHONY-GUI.url`에도 저장됩니다. GUI에서 자연어 제작 요청을 접수해 batch, `PROMPT.md`, QA 뼈대를 만들고, 진행도도 확인할 수 있습니다. 실제 PNG 생성과 `final/` 승격은 여전히 별도 생성/QA 단계입니다.
 
 ## 1. 리소스 요청 브리프부터 받는다
 

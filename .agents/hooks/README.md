@@ -54,6 +54,12 @@ Common states:
 
 The hook only reads batch docs/assets and optionally writes `output/SYMPHONY.md`. It does not call image APIs and does not move assets into `final/`.
 
+For batches using the local Runner, `qa/asset-status.json` or
+`qa/asset-statuses.json` is the canonical status source. It records the
+candidate and report checksums, automated QA outcome, required visual reviews,
+and promotion eligibility. The hook uses it instead of scanning prose in
+`QA.md` for PASS/FAIL text.
+
 ## Mini-Symphony GUI
 
 Start the browser dashboard from the project root:
@@ -70,7 +76,10 @@ output/SYMPHONY-GUI.json
 output/SYMPHONY-GUI.log
 ```
 
-The GUI is read-only. Commands still happen in Codex chat or PowerShell. The node flow and live log panels show the current scan node, active batch state, blockers, and server events as they happen.
+The GUI accepts a local natural-language intake request and creates the batch,
+`PROMPT.md`, and QA scaffold. It does not call image APIs or promote a PNG into
+`final/`. The node flow and live log panels show the current scan node, active
+batch state, blockers, and server events as they happen.
 
 ## new-batch.ps1
 
@@ -109,6 +118,11 @@ This creates:
 - `MANIFEST.md`
 - `QA.md`
 - `prompts/`, `generated/`, `source/`, `manifests/`, `tools/`, `qa/`, `final/`
+
+New scaffolds also include `contracts/` and `qa/asset-statuses.json`. Start a
+per-asset contract from `templates/asset-contract-template.json`; use
+`tools/runner/asset_gate.py` to validate and atomically promote an approved
+candidate. This workflow remains local and never stores an API key.
 
 It also writes the strict `gpt-image-2` generation target and SpriteMake output paths into `PROMPT.md`.
 

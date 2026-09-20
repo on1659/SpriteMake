@@ -2,6 +2,23 @@
 
 SpriteMake는 직접 이미지 생성 API를 호출하는 앱이 아닙니다.
 
+## Promotion Gate
+
+`final/`은 QA 문구만으로 채우지 않습니다. 새 batch는 `contracts/`의
+asset contract와 `qa/asset-statuses.json`을 사용합니다.
+
+```text
+generated candidate
+-> automated QA (candidate/report checksum recorded)
+-> filename/content and optional style review approval
+-> local atomic promotion
+-> final
+```
+
+`tools/runner/asset_gate.py`는 candidate 또는 QA report가 승인 뒤 바뀌면
+승격을 거부합니다. Codex 직접 생성의 `unverified` 표기는 QA를 막는 조건이
+아니며 provenance 기록일 뿐입니다.
+
 현재 기본 흐름은 키 없는 Codex 직접 생성입니다. Codex 이미지 생성 기능으로 바로 시도하되, 모델을 `gpt-image-2`로 강제하거나 검증하지는 않습니다.
 
 역할은 이것입니다.
@@ -68,11 +85,62 @@ output/SYMPHONY.md
 
 이 BAT는 빈 로컬 포트를 자동으로 선택해서 SpriteMake Mini-Symphony 대시보드를 띄웁니다.
 
+macOS에서는 터미널에서 다음을 실행하거나 `start-symphony-gui_mac.command`를
+더블클릭합니다.
+
+```bash
+./start-symphony-gui.sh
+```
+
+처음 한 번 실행 권한이 필요하면 다음을 실행합니다.
+
+```bash
+chmod +x start-symphony-gui.sh start-symphony-gui_mac.command
+```
+
 ```text
 output/SYMPHONY-GUI.url
 ```
 
 에도 마지막 GUI 주소가 저장됩니다.
+
+### ChatGPT 계정 연결
+
+대시보드 상단의 `ChatGPT 계정 연결`을 누르면 이 Mac의 Codex가 공식 로그인
+브라우저 창을 엽니다. 로그인 후에는 연결 여부와 사용량 창만 표시됩니다.
+SpriteMake는 API key, 비밀번호, OAuth URL, 이메일, 토큰을 입력받거나 저장하지
+않습니다. `로그아웃`은 Codex의 로컬 관리형 로그인을 해제합니다.
+
+### Claude Code에서 batch 요청 보내기
+
+대시보드를 켠 뒤 Claude Code 세션이나 터미널에서 자연어 요청을 로컬
+endpoint로 보낼 수 있습니다. 이 endpoint는 **이미지를 생성하지 않고**
+batch, 요청서, `PROMPT.md`, QA 뼈대만 만듭니다. API key나 ChatGPT 토큰도
+받거나 저장하지 않습니다.
+
+```bash
+curl -X POST "http://127.0.0.1:포트/api/batch-intake" \
+  -H "Content-Type: application/json" \
+  -d '{"request":"불과 얼음 속성의 탑승 가능한 드래곤 스프라이트 만들어줘"}'
+```
+
+응답의 `batchPath`와 `promptPath`를 Claude Code에 전달하면 됩니다. `mode`는
+`codex`, `codex-setup`, `gpt-image-2`, `pending` 중 하나를 선택할 수 있고,
+기본값은 `codex`입니다. endpoint는 loopback 요청만 허용하며, 출력 경로와
+명령을 받지 않습니다.
+
+포트까지 Claude Code가 자동으로 읽게 하려면, SpriteMake 루트에서 다음처럼
+호출합니다.
+
+```bash
+node tools/runner/request-batch.js "불과 얼음 속성의 탑승 가능한 드래곤 스프라이트 만들어줘"
+```
+
+두 번째 인자로 generation mode도 줄 수 있습니다.
+
+```bash
+node tools/runner/request-batch.js "16x16 회복 포션 아이콘" codex-setup
+```
 
 실시간 로그와 현재 노드 진행도는 같은 화면의 `현재 진행 노드` / `실시간 로그` 패널에서 볼 수 있습니다. 원본 로그 파일은 다음 위치에 계속 append됩니다.
 

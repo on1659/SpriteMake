@@ -19,6 +19,7 @@ output/{game-or-feature}/
   generated/
   source/
   manifests/
+  contracts/
   tools/
   qa/
   final/
@@ -75,14 +76,20 @@ source/
 manifests/
 - JSON manifests used by preview tools and game integration.
 
+contracts/
+- Versioned per-asset JSON contracts. The contract is the single source for
+  canvas/grid/cell, anchor, baseline, coverage thresholds, required reviews,
+  and the intended final path.
+
 tools/
 - Copied/adapted animation preview HTML tools.
 
 qa/
-- QA reports, screenshots, bbox logs, and comparison images.
+- QA reports, screenshots, bbox logs, comparison images, and canonical
+  `asset-status.json` or `asset-statuses.json` records.
 
 final/
-- QA-passed PNGs ready to copy into the target game project.
+- Only explicitly promoted PNGs. A passing QA report alone never writes here.
 ```
 
 ## Batch Status Terms

@@ -1,0 +1,30 @@
+{
+  "$schema": "../../../tools/runner/asset-contract.schema.json",
+  "schemaVersion": 1,
+  "assetId": "dragon-rider",
+  "version": 1,
+  "target": {
+    "finalPath": "final/dragon-rider.png"
+  },
+  "atlas": {
+    "canvas": { "width": 512, "height": 256 },
+    "grid": { "columns": 4, "rows": 2, "cellWidth": 128, "cellHeight": 128 },
+    "anchor": { "x": 64, "y": 110, "meaning": "ground/mount contact" },
+    "sourcePlaneY": 110
+  },
+  "qa": {
+    "required": ["canvas", "grid", "alpha", "bbox", "anchor", "baseline"],
+    "thresholds": {
+      "minimumWidthCoveragePercent": null,
+      "maximumWidthPixels": null,
+      "minimumFrameDiffPixels": {},
+      "maximumDiffOutsideAllowedMaskPixels": null,
+      "maximumHaloPixels": 0,
+      "maximumAlpha1To7Pixels": 0
+    }
+  },
+  "reviews": {
+    "filenameContent": { "required": true },
+    "style": { "required": false, "referencePath": null, "comparisonRequired": false }
+  }
+}

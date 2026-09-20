@@ -208,6 +208,125 @@
       overflow-wrap: anywhere;
     }
 
+    .intake-card {
+      margin-top: 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .intake-card-head {
+      padding: 14px 16px 0;
+    }
+
+    .intake-card-head h2 {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    .intake-card-head p,
+    .intake-status {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .intake-form {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 176px auto;
+      gap: 10px;
+      align-items: start;
+      padding: 14px 16px 16px;
+    }
+
+    .intake-field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .intake-field label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .intake-field textarea,
+    .intake-field select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #111820;
+      color: var(--ink);
+      font: inherit;
+    }
+
+    .intake-field textarea {
+      min-height: 72px;
+      resize: vertical;
+      padding: 10px;
+      line-height: 1.45;
+    }
+
+    .intake-field select {
+      min-height: 40px;
+      padding: 0 9px;
+    }
+
+    .intake-field textarea:focus,
+    .intake-field select:focus {
+      border-color: var(--blue);
+      outline: 2px solid rgba(80, 167, 220, 0.2);
+    }
+
+    .intake-submit {
+      align-self: end;
+      min-height: 40px;
+    }
+
+    .intake-status {
+      min-height: 20px;
+      padding: 0 16px 14px;
+    }
+
+    .intake-status.success { color: var(--green); }
+    .intake-status.error { color: var(--red); }
+
+    .account-card {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items: center;
+      margin-top: 16px;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--violet);
+      border-radius: 10px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .account-copy strong,
+    .account-copy span {
+      display: block;
+    }
+
+    .account-copy span {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .account-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
     .status-pill {
       display: inline-flex;
       align-items: center;
@@ -1593,6 +1712,22 @@
         grid-template-columns: 1fr;
       }
 
+      .intake-form {
+        grid-template-columns: 1fr;
+      }
+
+      .account-card {
+        grid-template-columns: 1fr;
+      }
+
+      .account-actions {
+        justify-content: flex-start;
+      }
+
+      .intake-submit {
+        justify-self: start;
+      }
+
       .command-strip {
         overflow: hidden;
       }
@@ -1731,10 +1866,46 @@
     <main class="main">
       <section class="command-strip">
         <div>
-          <strong>명령은 여기 Codex 채팅에서 내리고, 이 화면은 진행 중인 노드를 실시간으로 보여줍니다.</strong>
-          <span>대시보드는 `symphony.ps1 -Json -WriteReport` 결과를 읽습니다. SpriteMake는 API key를 저장하거나 이미지 생성 API를 직접 호출하지 않습니다.</span>
+          <strong>새 제작 요청은 아래에서 바로 접수하고, 이 화면에서 작업 상태를 확인합니다.</strong>
+          <span>SpriteMake는 API key를 저장하거나 이미지 생성 API를 직접 호출하지 않습니다. 생성 결과는 항상 generated/에서 QA를 거칩니다.</span>
         </div>
         <span class="status-pill pending" id="lastUpdated">업데이트 대기</span>
+      </section>
+
+      <section class="account-card" aria-labelledby="accountTitle">
+        <div class="account-copy">
+          <strong id="accountTitle">Codex 계정</strong>
+          <span id="accountStatus">Codex 계정 상태를 확인하는 중...</span>
+          <span id="accountUsage">로그인 정보·토큰·이메일은 이 화면에 저장하거나 표시하지 않습니다.</span>
+        </div>
+        <div class="account-actions">
+          <button class="button primary" type="button" id="accountConnect">ChatGPT 계정 연결</button>
+          <button class="button" type="button" id="accountLogout" disabled>로그아웃</button>
+        </div>
+      </section>
+
+      <section class="intake-card" aria-labelledby="intakeTitle">
+        <div class="intake-card-head">
+          <h2 id="intakeTitle">새 스프라이트 제작 요청</h2>
+          <p>자연어 요청을 보내면 batch, PROMPT.md, QA 뼈대를 만듭니다. 여기서는 PNG를 바로 생성하지 않습니다.</p>
+        </div>
+        <form class="intake-form" id="intakeForm">
+          <div class="intake-field">
+            <label for="intakeRequest">무엇을 만들까요?</label>
+            <textarea id="intakeRequest" name="request" maxlength="8000" required placeholder="예: 불과 얼음 속성의 탑승 가능한 드래곤 스프라이트 만들어줘"></textarea>
+          </div>
+          <div class="intake-field">
+            <label for="intakeMode">준비 방식</label>
+            <select id="intakeMode" name="mode">
+              <option value="codex">Codex 생성 handoff</option>
+              <option value="codex-setup">세팅만</option>
+              <option value="gpt-image-2">엄격 외부 gpt-image-2</option>
+              <option value="pending">나중에 선택</option>
+            </select>
+          </div>
+          <button class="button primary intake-submit" type="submit" id="intakeSubmit">제작 batch 준비</button>
+        </form>
+        <p class="intake-status" id="intakeStatus" role="status">요청을 입력하면 새 batch가 생성됩니다.</p>
       </section>
 
       <section class="summary-grid" aria-label="진행도 요약">
@@ -1951,6 +2122,7 @@
     let dashboardData = null;
     let selectedBatch = null;
     let refreshTimer = null;
+    let accountRefreshTimer = null;
     let logEntries = [];
     let eventSource = null;
     let graphZoom = 1;
@@ -2001,6 +2173,15 @@
       logList: document.getElementById("logList"),
       eventStatus: document.getElementById("eventStatus"),
       refreshButton: document.getElementById("refreshButton"),
+      accountStatus: document.getElementById("accountStatus"),
+      accountUsage: document.getElementById("accountUsage"),
+      accountConnect: document.getElementById("accountConnect"),
+      accountLogout: document.getElementById("accountLogout"),
+      intakeForm: document.getElementById("intakeForm"),
+      intakeRequest: document.getElementById("intakeRequest"),
+      intakeMode: document.getElementById("intakeMode"),
+      intakeSubmit: document.getElementById("intakeSubmit"),
+      intakeStatus: document.getElementById("intakeStatus"),
       toast: document.getElementById("toast"),
       toastMessage: document.getElementById("toastMessage"),
       assetModal: document.getElementById("assetModal"),
@@ -2783,9 +2964,107 @@
       }
     }
 
+    async function submitIntake(event) {
+      event.preventDefault();
+      const request = elements.intakeRequest.value.trim();
+      if (!request) return;
+
+      elements.intakeSubmit.disabled = true;
+      elements.intakeStatus.className = "intake-status";
+      elements.intakeStatus.textContent = "제작 batch를 준비하는 중...";
+      try {
+        const response = await fetch("/api/batch-intake", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ request, mode: elements.intakeMode.value }),
+        });
+        const payload = await response.json();
+        if (!response.ok) throw new Error(payload.message || "batch intake failed");
+
+        elements.intakeRequest.value = "";
+        elements.intakeStatus.className = "intake-status success";
+        elements.intakeStatus.textContent = `준비 완료: ${payload.batchPath} · ${payload.nextAction}`;
+        await loadStatus();
+        selectBatch(payload.batchId);
+      } catch (error) {
+        elements.intakeStatus.className = "intake-status error";
+        elements.intakeStatus.textContent = `준비 실패: ${error.message}`;
+      } finally {
+        elements.intakeSubmit.disabled = false;
+      }
+    }
+
+    function renderAccount(account) {
+      if (account?.connected) {
+        elements.accountStatus.textContent = `연결됨${account.planType ? ` · ${account.planType}` : ""}`;
+        const limits = Array.isArray(account.rateLimits) ? account.rateLimits : [];
+        elements.accountUsage.textContent = limits.length
+          ? limits.map((limit, index) => `사용량 창 ${index + 1}: ${limit.remainingPercent}% 남음`).join(" · ")
+          : "현재 사용량 정보를 불러올 수 없습니다.";
+        elements.accountConnect.disabled = true;
+        elements.accountLogout.disabled = false;
+      } else if (account?.loginPending) {
+        elements.accountStatus.textContent = "브라우저에서 로그인 진행 중";
+        elements.accountUsage.textContent = "열린 브라우저에서 ChatGPT 로그인을 완료하면 이 화면이 자동으로 갱신됩니다.";
+        elements.accountConnect.disabled = true;
+        elements.accountLogout.disabled = true;
+      } else {
+        elements.accountStatus.textContent = "연결되지 않음";
+        elements.accountUsage.textContent = "연결하면 이 Mac의 Codex가 공식 ChatGPT 로그인 창을 엽니다. API 키를 입력하지 않습니다.";
+        elements.accountConnect.disabled = false;
+        elements.accountLogout.disabled = true;
+      }
+    }
+
+    async function loadAccount() {
+      try {
+        const response = await fetch(`/api/account?ts=${Date.now()}`);
+        const payload = await response.json();
+        if (!response.ok) throw new Error(payload.message || "account request failed");
+        renderAccount(payload.account);
+      } catch {
+        elements.accountStatus.textContent = "Codex 계정 상태를 불러올 수 없음";
+        elements.accountUsage.textContent = "이 Mac에서 Codex App Server를 시작할 수 있는지 확인하세요.";
+        elements.accountConnect.disabled = true;
+        elements.accountLogout.disabled = true;
+      }
+    }
+
+    async function connectAccount() {
+      elements.accountConnect.disabled = true;
+      elements.accountStatus.textContent = "브라우저에서 ChatGPT 로그인을 여는 중...";
+      try {
+        const response = await fetch("/api/account/login", { method: "POST" });
+        const payload = await response.json();
+        if (!response.ok) throw new Error(payload.message || "login request failed");
+        elements.accountUsage.textContent = "열린 브라우저에서 로그인을 마치면 이 화면이 자동으로 갱신됩니다.";
+      } catch (error) {
+        elements.accountStatus.textContent = "계정 연결을 열지 못했습니다";
+        elements.accountUsage.textContent = error.message;
+        elements.accountConnect.disabled = false;
+      }
+    }
+
+    async function logoutAccount() {
+      elements.accountLogout.disabled = true;
+      try {
+        const response = await fetch("/api/account/logout", { method: "POST" });
+        const payload = await response.json();
+        if (!response.ok) throw new Error(payload.message || "logout request failed");
+        renderAccount(payload.account);
+      } catch (error) {
+        elements.accountStatus.textContent = "로그아웃하지 못했습니다";
+        elements.accountUsage.textContent = error.message;
+        elements.accountLogout.disabled = false;
+      }
+    }
+
     setupWorkflowSwitcher();
 
     elements.refreshButton.addEventListener("click", loadStatus);
+    elements.accountConnect.addEventListener("click", connectAccount);
+    elements.accountLogout.addEventListener("click", logoutAccount);
+    elements.intakeForm.addEventListener("submit", submitIntake);
     elements.workflowToggleButton.addEventListener("click", () => {
       setWorkflowView(workflowView === "graph" ? "flow" : "graph");
     });
@@ -2805,12 +3084,15 @@
     });
     setZoom(graphZoom);
     connectEvents();
+    loadAccount();
     loadLogs();
     loadStatus();
     refreshTimer = window.setInterval(loadStatus, 15000);
+    accountRefreshTimer = window.setInterval(loadAccount, 5000);
     window.addEventListener("beforeunload", () => {
       if (eventSource) eventSource.close();
       window.clearInterval(refreshTimer);
+      window.clearInterval(accountRefreshTimer);
     });
   </script>
 </body>

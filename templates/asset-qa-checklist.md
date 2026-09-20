@@ -10,6 +10,8 @@ Run this checklist after receiving or generating a game asset. The goal is to ca
 - Player-readable purpose is clear at the intended in-game scale.
 - Visual direction matches the requested style family.
 - Existing asset proportions, angle, outline weight, and lighting are respected.
+- When this extends an existing character, the reference image and its checksum
+  are recorded, and a side-by-side comparison is attached for visual approval.
 
 ## File And Format
 
@@ -85,6 +87,21 @@ For each output:
 - Character/FX silhouette remains readable at in-game display size.
 - Color variants change only intended color regions.
 - Lighting and outline weight match neighboring assets.
+- For progressive animation states, frame-to-frame diff meets the per-asset
+  minimum visible-change threshold at game display scale.
+- When only a declared region may change, the diff outside that allowed mask is
+  measured and stays within its per-asset limit.
+
+## Promotion Gate
+
+- The candidate path and QA report checksum are recorded in a structured asset
+  status file.
+- The QA report was made with the current version of the asset contract.
+- Required filename/content and style reviews are explicitly `approved`, not
+  inferred from a generated comparison image.
+- Candidate, QA report, reference, and comparison inputs are unchanged since
+  approval.
+- `final/` was populated only by the local atomic promotion gate.
 
 ## Quick Pillow Probe
 

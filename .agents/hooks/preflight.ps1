@@ -35,6 +35,7 @@ $required = @(
   "templates\resource-request-template.md",
   "templates\sprite-atlas-template.md",
   "templates\asset-qa-checklist.md",
+  "templates\asset-contract-template.json",
   "templates\animation-player-template.html",
   "templates\animation-manifest-template.json",
   ".agents\README.md",

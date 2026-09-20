@@ -260,7 +260,9 @@ output/SYMPHONY-GUI.url
 output/SYMPHONY-GUI.json
 ```
 
-GUI는 읽기 전용이다. 명령은 Codex 채팅이나 PowerShell에서 내리고, GUI는 `/api/status`를 통해 `.agents/hooks/symphony.ps1 -Json -WriteReport` 결과만 보여준다.
+GUI는 `/api/batch-intake`로 자연어 제작 요청을 접수해 batch, `PROMPT.md`, QA
+뼈대를 만들고, `/api/status`를 통해 `.agents/hooks/symphony.ps1 -Json -WriteReport`
+결과를 보여준다. 이미지 API 호출과 `final/` 승격은 GUI가 하지 않는다.
 
 GUI에는 `현재 진행 노드`와 `실시간 로그` 패널이 있다. 서버/스캔/Batch 상태 변화는 `output/SYMPHONY-GUI.log`에 JSONL로 append되고, 브라우저는 `/api/events` SSE 스트림으로 즉시 갱신한다.
 
@@ -339,7 +341,7 @@ QA 통과 전 파일은 실제 게임 프로젝트의 production asset으로 취
 - `templates/animation-manifest-template.json` parses as JSON.
 - `.agents/hooks/preflight.ps1` passed.
 - `.agents/hooks/symphony.ps1` scans output batches and can write `output/SYMPHONY.md`.
-- `start-symphony-gui.bat` launches the read-only Mini-Symphony dashboard on a random local port.
+- `start-symphony-gui.bat`, `.sh`, and `_mac.command` launch the local Mini-Symphony dashboard on a random local port; it includes batch intake but not image generation or final promotion.
 - `.agents/skills/spritemake-batch` skill validation passed.
 - `.agents/hooks/prompt-inject.ps1` injects the required `gpt-image-2` block.
 - `.agents/hooks/generation-choice.ps1` prints the standard Codex-vs-gpt-image-2 question.

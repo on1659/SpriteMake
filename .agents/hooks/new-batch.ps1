@@ -87,6 +87,7 @@ $folders = @(
   "generated",
   "source",
   "manifests",
+  "contracts",
   "tools",
   "qa",
   "final"
@@ -102,6 +103,7 @@ $requestsMd = Join-Path $batchRoot "REQUESTS.md"
 $promptMd = Join-Path $batchRoot "PROMPT.md"
 $manifestMd = Join-Path $batchRoot "MANIFEST.md"
 $qaMd = Join-Path $batchRoot "QA.md"
+$assetStatusesJson = Join-Path $batchRoot "qa\asset-statuses.json"
 
 function Write-TextIfMissing([string]$Path, [string[]]$Lines) {
   if (-not (Test-Path -LiteralPath $Path)) {
@@ -297,6 +299,13 @@ Write-TextIfMissing $manifestMd @(
   "| TBD | TBD | TBD | TBD | TBD | TBD |"
 )
 
+Write-TextIfMissing $assetStatusesJson @(
+  '{',
+  '  "schemaVersion": 1,',
+  '  "assetStatuses": []',
+  '}'
+)
+
 Write-TextIfMissing $qaMd @(
   "# QA: $BatchId",
   "",
@@ -309,6 +318,8 @@ Write-TextIfMissing $qaMd @(
   "- Needs regeneration:",
   "- Needs repack:",
   "- Ready for game:",
+  "- Canonical asset status: qa/asset-statuses.json",
+  "- Promotion rule: generated candidate -> automated QA -> required human reviews -> atomic final promotion.",
   "",
   "## Reports",
   "",

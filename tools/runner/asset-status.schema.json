@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SpriteMake asset status",
+  "type": "object",
+  "required": ["schemaVersion", "assetId", "contractVersion", "candidate", "qa", "reviews", "promotion"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "assetId": { "type": "string", "minLength": 1 },
+    "contractVersion": { "type": "integer", "minimum": 1 },
+    "candidate": {
+      "type": "object",
+      "required": ["path", "sha256", "provenance"],
+      "properties": {
+        "path": { "type": "string", "pattern": "^generated/" },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "provenance": { "type": "string", "minLength": 1 }
+      }
+    },
+    "qa": {
+      "type": "object",
+      "required": ["status", "reportPath", "reportSha256"],
+      "properties": { "status": { "enum": ["pass", "fail", "pending"] } }
+    },
+    "reviews": { "type": "object" },
+    "promotion": {
+      "type": "object",
+      "required": ["eligible", "status"],
+      "properties": { "status": { "enum": ["candidate", "blocked", "promoted"] } }
+    }
+  }
+}

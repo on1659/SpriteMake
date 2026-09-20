@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SpriteMake asset contract",
+  "type": "object",
+  "required": ["schemaVersion", "assetId", "version", "target", "atlas", "qa", "reviews"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "assetId": { "type": "string", "minLength": 1 },
+    "version": { "type": "integer", "minimum": 1 },
+    "target": {
+      "type": "object",
+      "required": ["finalPath"],
+      "properties": { "finalPath": { "type": "string", "pattern": "^final/" } }
+    },
+    "atlas": { "type": "object" },
+    "qa": { "type": "object", "required": ["required", "thresholds"] },
+    "reviews": { "type": "object", "required": ["filenameContent", "style"] }
+  }
+}
