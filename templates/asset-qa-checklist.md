@@ -10,6 +10,13 @@ Run this checklist after receiving or generating a game asset. The goal is to ca
 - Player-readable purpose is clear at the intended in-game scale.
 - Visual direction matches the requested style family.
 - Existing asset proportions, angle, outline weight, and lighting are respected.
+- When this extends an existing character, the reference image and its checksum
+  are recorded, and a side-by-side comparison is attached for visual approval.
+- Animated character states derive from an accepted base and one approved
+  single-pose reference per actual direction. Identity, motion timing and layout
+  geometry inputs have separate documented roles.
+- Asymmetric features retain their physical side; any mirrored derivation was
+  explicitly approved and its source/transform recorded.
 
 ## File And Format
 
@@ -30,6 +37,8 @@ Run this checklist after receiving or generating a game asset. The goal is to ca
 - No cell is empty.
 - Row order and column order match the request.
 - Any source/contact-sheet image was repacked into a strict atlas before use.
+- Related frames use a common documented scale and reproducible offsets, not
+  independent bbox normalization to fill every cell.
 
 ## Anchor And Baseline
 
@@ -39,6 +48,24 @@ Run this checklist after receiving or generating a game asset. The goal is to ca
 - Grounded frames touch the same local Y baseline.
 - Horizontal drift is expected and intentional, not caused by loose spacing.
 - If the asset has variants, all variants share the same anchor and baseline.
+- Intentional airborne displacement remains intact. Bbox ground alignment does
+  not substitute for explicit placement review against the declared source plane.
+- Direction reference images are not confused with runtime contact coordinates.
+
+## Semantic Motion Review
+
+- Animated assets declare sequences, FPS and loop intent in the contract and
+  enable `reviews.motion.required`. Static assets leave animations empty.
+- Motion is watched at intended game scale; identity, anatomy, contact phases
+  and state readability are reviewed separately from geometric QA.
+- Walk/run remain experimental until this review explicitly passes; static
+  bobbing, broken joints, direction errors and unstable foot contacts fail.
+- Looping states have a readable last-to-first transition. Non-loop actions have
+  a readable start/middle/end and are not forced to loop.
+- Duplicate-frame, frame-diff and seam measurements are recorded as evidence;
+  they never automatically approve motion or placement.
+- Playback slowdown does not conceal a failing motion verdict. Sequence edits,
+  re-export, reference replacement and regeneration require fresh QA/reviews.
 
 ## Y-Axis Plane Alignment
 
@@ -75,6 +102,8 @@ For each output:
 - Report per-cell alpha bbox for sprite atlases when possible.
 - Confirm transparent corners for transparent assets.
 - Confirm no accidental colored key fringe remains.
+- `maximumHaloPixels` requires custom/manual measurement; the common inspector
+  cannot verify it, and alpha 1..7 counts do not measure halo.
 - If the bbox changed, report whether code placement needs an offset update.
 
 ## Pixel/Visual Quality
@@ -85,6 +114,42 @@ For each output:
 - Character/FX silhouette remains readable at in-game display size.
 - Color variants change only intended color regions.
 - Lighting and outline weight match neighboring assets.
+- For progressive animation states, frame-to-frame diff meets the per-asset
+  minimum visible-change threshold at game display scale.
+- When only a declared region may change, the diff outside that allowed mask is
+  measured and stays within its per-asset limit.
+
+## Promotion Gate
+
+- The candidate path and QA report checksum are recorded in a structured asset
+  status file.
+- The QA report was made with the current version of the asset contract.
+- `qa.contractSha256` matches the current contract bytes; old approvals missing
+  it require regenerated QA even when the version number is unchanged.
+- Contract `references` and `qa.requiredInputs` include all base/direction
+  references, selection recipes and runtime manifests used by the candidate.
+- `qa.inputChecksums` lists their paths/SHA-256 values. Paths stay under batch
+  `source/`, `generated/`, `manifests/` or `qa/`.
+- Style reviews record `comparisonSha256` and `referenceSha256` when declared.
+- Required filename/content and style reviews are explicitly `approved`, not
+  inferred from a generated comparison image.
+- Candidate, QA report, reference, and comparison inputs are unchanged since
+  approval.
+- `final/` was populated only by the local atomic promotion gate.
+- Required placement review is `approved` when anchor/baseline checks are
+  requested or `reviews.placement.required` is true; animated motion review is
+  also explicitly `approved`.
+
+The common offline inspector interface is:
+
+```text
+python3 tools/runner/inspect_sprite.py --batch-root <batch> --contract <contract> --image <candidate> --output <qa-report> [--status <asset-status>]
+```
+
+It writes geometric measurements, fingerprints and pending review statuses;
+it never promotes or infers semantic approval. Unsupported required automatic
+measurements need manual/custom QA before automated QA can be recorded as pass.
+Geometric QA pass still leaves semantic placement/motion review pending.
 
 ## Quick Pillow Probe
 

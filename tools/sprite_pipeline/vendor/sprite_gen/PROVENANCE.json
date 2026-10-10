@@ -1,0 +1,14 @@
+{
+  "repository": "https://github.com/aldegad/sprite-gen",
+  "revision": "3dc080aa8faa8b5a6dfe865b1247c047761f8fd1",
+  "tag": "v2.44.0",
+  "source": "sprite_gen/effects/recolor.py",
+  "upstreamSourceSha256": "d2ad2cf51170801c5edf90fca836bfebf65d46c98cb712cdc048a2f822b3a6f6",
+  "license": "Apache-2.0",
+  "modifications": [
+    "Extracted seven pure NumPy helpers without changes to their function bodies.",
+    "Replaced sprite_gen._deps import with direct numpy import.",
+    "Removed CLI, file I/O, and engine dependencies."
+  ],
+  "scope": "Offline RGB palette transforms only; no providers, authentication, network, or image generation."
+}

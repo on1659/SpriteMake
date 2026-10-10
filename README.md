@@ -1,4 +1,4 @@
-﻿# SpriteMake
+# SpriteMake
 
 Continuation memo:
 
@@ -71,6 +71,16 @@ SpriteMake는 게임에 바로 넣을 수 있는 스프라이트를 일괄 생�
 - 실제 게임 프로젝트로 옮길 수 있는 target path
 
 > 예쁜 그림이 아니라, 게임 코드가 정확히 자르고 정확히 배치할 수 있는 리소스를 만든다.
+
+
+## Offline sprite processing
+
+Existing PNGs can now be processed locally into color variants and strict atlases
+with fingerprinted QA and standalone frame curation. See
+[tools/sprite_pipeline/README.md](tools/sprite_pipeline/README.md).
+Run the complete geometric human fixture from
+[examples/sprite-pipeline/create_demo.py](examples/sprite-pipeline/create_demo.py),
+then open the generated animation-preview.html or curation.html directly.
 
 ## What This Project Does
 

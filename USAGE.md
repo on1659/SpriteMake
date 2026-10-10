@@ -1,4 +1,4 @@
-﻿# SpriteMake Usage
+# SpriteMake Usage
 
 SpriteMake는 직접 이미지 생성 API를 호출하는 앱이 아닙니다.
 
@@ -370,3 +370,13 @@ SpriteMake 진행도 GUI 켜줘.
 ```
 
 
+
+
+## 기존 PNG 후처리와 프레임 보정
+
+[오프라인 파이프라인](tools/sprite_pipeline/README.md)으로 색상 변형, 명시적
+chroma 정리, 프레임 rect 추출, sprite-gen manifest 변환, 고정 격자 배치를
+실행할 수 있습니다. 각 시도는 새 후보·계약·manifest·QA·file:// 프리뷰와
+보정 HTML을 만들며 원본과 final 파일은 보존합니다. 보정 화면에서 레시피를
+저장한 뒤 새 attempt로 다시 빌드하세요. 사람의 동작·접지 검토는 별도로
+필요합니다. 시작용은 templates/sprite-process-recipe-template.json입니다.

@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "contract": "contracts/asset.json",
+  "scale": 1,
+  "frames": [
+    {
+      "path": "source/frame.png",
+      "row": 0,
+      "column": 0,
+      "sourceAnchor": [0, 0],
+      "offset": [0, 0]
+    }
+  ]
+}
