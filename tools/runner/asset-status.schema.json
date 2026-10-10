@@ -1,0 +1,186 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SpriteMake asset status",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "assetId",
+    "contractVersion",
+    "candidate",
+    "qa",
+    "reviews",
+    "promotion"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "assetId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "contractVersion": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "candidate": {
+      "type": "object",
+      "required": [
+        "path",
+        "sha256",
+        "provenance"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": "^generated/"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "provenance": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "qa": {
+      "type": "object",
+      "required": [
+        "status",
+        "reportPath",
+        "reportSha256",
+        "contractSha256",
+        "inputChecksums"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "pass",
+            "fail",
+            "pending"
+          ]
+        },
+        "reportPath": {
+          "type": "string",
+          "pattern": "^qa/"
+        },
+        "reportSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "contractSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "inputChecksums": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "path",
+              "sha256"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "pattern": "^(source|generated|manifests|qa|contracts)/[^\\\\]+$"
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "role": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    "reviews": {
+      "type": "object",
+      "properties": {
+        "filenameContent": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "enum": [
+                "pending",
+                "approved",
+                "rejected"
+              ]
+            }
+          }
+        },
+        "motion": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "enum": [
+                "pending",
+                "approved",
+                "rejected"
+              ]
+            }
+          }
+        },
+        "placement": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "enum": [
+                "pending",
+                "approved",
+                "rejected"
+              ]
+            }
+          }
+        },
+        "style": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "enum": [
+                "pending",
+                "approved",
+                "rejected"
+              ]
+            },
+            "comparisonPath": {
+              "type": "string",
+              "pattern": "^qa/"
+            },
+            "comparisonSha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "referenceSha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          }
+        }
+      }
+    },
+    "promotion": {
+      "type": "object",
+      "required": [
+        "eligible",
+        "status"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "candidate",
+            "blocked",
+            "promoted"
+          ]
+        }
+      }
+    }
+  }
+}

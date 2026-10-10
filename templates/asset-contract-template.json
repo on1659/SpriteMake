@@ -1,0 +1,39 @@
+{
+  "$schema": "../../tools/runner/asset-contract.schema.json",
+  "schemaVersion": 1,
+  "assetId": "{asset-id}",
+  "version": 1,
+  "references": [],
+  "target": {
+    "finalPath": "final/{asset-category}/{asset-id}.png"
+  },
+  "atlas": {
+    "canvas": { "width": 0, "height": 0 },
+    "grid": { "columns": 1, "rows": 1, "cellWidth": 0, "cellHeight": 0 },
+    "anchor": { "x": 0, "y": 0, "meaning": "{contact-anchor}" },
+    "sourcePlaneY": 0,
+    "animations": {}
+  },
+  "qa": {
+    "requiredInputs": [],
+    "required": ["canvas", "grid", "alpha", "bbox", "anchor", "baseline"],
+    "thresholds": {
+      "minimumWidthCoveragePercent": null,
+      "maximumWidthPixels": null,
+      "minimumFrameDiffPixels": {},
+      "maximumDiffOutsideAllowedMaskPixels": null,
+      "maximumHaloPixels": 0,
+      "maximumAlpha1To7Pixels": 0
+    }
+  },
+  "reviews": {
+    "filenameContent": { "required": true },
+    "placement": { "required": true },
+    "motion": { "required": false },
+    "style": {
+      "required": false,
+      "referencePath": null,
+      "comparisonRequired": false
+    }
+  }
+}

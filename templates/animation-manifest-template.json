@@ -2,10 +2,12 @@
   "sheets": {
     "main": {
       "label": "Main Sprite Atlas",
-      "image": "../assets/characters/player-atlas.png",
+      "image": "../generated/player-atlas-candidate.png",
+      "canvas": { "width": 768, "height": 288 },
+      "cell": { "width": 384, "height": 288 },
       "grid": {
-        "columns": 4,
-        "rows": 6
+        "columns": 2,
+        "rows": 1
       },
       "anchor": {
         "x": 192,
@@ -13,11 +15,17 @@
         "mode": "pixel"
       },
       "baselineY": 252,
+      "referenceInputs": [],
+      "reviewNotes": {
+        "motion": "pending: approve playback separately from geometric QA",
+        "placement": "pending: verify contact anchor and source plane visually",
+        "scale": "shared across frames; preserve intentional airborne displacement"
+      },
       "defaultScale": 1,
       "animations": {
         "idle": {
           "row": 0,
-          "frames": [0, 1, 2, 3],
+          "frames": [0, 1],
           "fps": 8,
           "loop": true
         }

@@ -1,4 +1,4 @@
-﻿# SpriteMake Handoff
+# SpriteMake Handoff
 
 ## 한국어 요약
 
@@ -394,3 +394,29 @@ D:\Work\vibe\SpriteMake\sprite-make-mockup.png
 
 
 
+
+
+## 2026-10-10 — offline sprite-gen processing integration
+
+Implemented tools/sprite_pipeline: pinned upstream recolor helpers with full
+LICENSE/NOTICE/provenance; local explicit chroma/component/rect processing;
+shared-scale fixed-grid packing; upstream absolute-frame manifest adapter;
+portable animation preview and non-destructive frame curation/recipe export.
+Each attempt creates new candidates and derived contracts. Original contract,
+recipe, sources, manifest and transform report are fingerprinted. Processing
+never approves reviews or writes final/game assets. Existing QA foundation is
+included in the integration branch, with contracts/ accepted as a QA input.
+
+Validation: 46 Python unittest cases passed on Python3.12.14/Pillow12.3.0/
+NumPy2.3.5. Real Chromium file:// checks reached ready:true with nonblank canvases,
+working animation selection, no console errors or blocked alpha reads. Browser
+1px recipe edits rebaked to the exact live alpha bbox. Existing Cyrano south-run
+8-frame provisional PNG repacked with identical pixels. These are processing
+checks, not an approval of Cyrano gait, anatomy, style or contact placement.
+PowerShell preflight was not run because PowerShell is not installed here.
+
+Start with tools/sprite_pipeline/README.md and
+examples/sprite-pipeline/create_demo.py. Optional video/RIFE, automatic anatomy
+repair and breathing animation are outside this PNG implementation. Chroma and
+pixelGrid are conservative local tools rather than the complete upstream unmix
+or lattice engines. Attempt statuses do not replace Symphony root status files.
