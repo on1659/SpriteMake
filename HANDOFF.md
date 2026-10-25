@@ -1,4 +1,4 @@
-﻿# SpriteMake Handoff
+# SpriteMake Handoff
 
 ## 한국어 요약
 

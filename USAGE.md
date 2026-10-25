@@ -1,4 +1,4 @@
-﻿# SpriteMake Usage
+# SpriteMake Usage
 
 SpriteMake는 직접 이미지 생성 API를 호출하는 앱이 아닙니다.
 
