@@ -15,6 +15,7 @@ output/{game-or-feature}/
   PROMPT.md
   MANIFEST.md
   QA.md
+  HANDOFF-CLAUDE.md
   prompts/
   generated/
   source/
@@ -59,6 +60,12 @@ QA.md
 - Per-cell bbox reports
 - Animation preview notes
 - Pass/fail state
+
+HANDOFF-CLAUDE.md
+- Mandatory completion report for a generation-only pass
+- Generation provenance and model-verification status
+- Copied style references, every raw attempt path, selected current best attempt, exclusions
+- Explicit QA/final/game-integration status and the next owner
 ```
 
 ## Output Folder Roles

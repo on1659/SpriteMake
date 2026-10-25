@@ -3,6 +3,7 @@
   "intended_timing": "when_user_requests_sprite_or_image_creation_without_specifying_generation_path",
   "script": ".agents/hooks/generation-choice.ps1",
   "purpose": "Ask whether the user wants keyless Codex direct generation, strict external gpt-image-2 generation, or setup-only SpriteMake scaffolding.",
+  "strict_unavailable_behavior": "If the user requests strict gpt-image-2 but the active tool cannot select or verify it, call generation-choice.ps1 -StrictUnavailable. Ask once whether to proceed as unverified Codex direct generation under generated/. Do not silently substitute or automatically refuse.",
   "choices": [
     {
       "id": "codex",

@@ -30,6 +30,10 @@ $required = @(
   "symphony-usage.html",
   "tools\symphony-gui\server.js",
   "tools\symphony-gui\public\index.html",
+  "tools\runner\inspect_sprite.py",
+  "tools\runner\asset_gate.py",
+  "tools\runner\asset-contract.schema.json",
+  "tools\runner\asset-status.schema.json",
   "templates\batch-sprite-request-template.md",
   "templates\folder-md-setup-template.md",
   "templates\resource-request-template.md",
@@ -72,6 +76,9 @@ if (Test-Path -LiteralPath $manifestPath) {
 }
 
 $hookConfigFiles = @(
+  "templates\asset-contract-template.json",
+  "tools\runner\asset-contract.schema.json",
+  "tools\runner\asset-status.schema.json",
   ".agents\hooks\sprite-intake.config.json",
   ".agents\hooks\symphony.config.json",
   ".agents\hooks\generation-choice.config.json",

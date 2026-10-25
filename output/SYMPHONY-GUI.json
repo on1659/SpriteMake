@@ -1,7 +1,7 @@
 {
-  "url": "http://127.0.0.1:62313/",
+  "url": "http://127.0.0.1:56204/",
   "host": "127.0.0.1",
-  "port": 62313,
-  "startedAt": "2026-05-04T17:19:41.622Z",
-  "projectRoot": "D:\\Work\\vibe\\SpriteMake"
+  "port": 56204,
+  "startedAt": "2026-10-21T14:56:58.175Z",
+  "projectRoot": "/Users/radar/Work/SpriteMake"
 }

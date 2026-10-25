@@ -103,6 +103,7 @@ $requestsMd = Join-Path $batchRoot "REQUESTS.md"
 $promptMd = Join-Path $batchRoot "PROMPT.md"
 $manifestMd = Join-Path $batchRoot "MANIFEST.md"
 $qaMd = Join-Path $batchRoot "QA.md"
+$handoffClaudeMd = Join-Path $batchRoot "HANDOFF-CLAUDE.md"
 $assetStatusesJson = Join-Path $batchRoot "qa\asset-statuses.json"
 
 function Write-TextIfMissing([string]$Path, [string[]]$Lines) {
@@ -186,6 +187,10 @@ Write-TextIfMissing $requestsMd @(
   "- Codex direct model guarantee: unverified",
   "- Target file path:",
   "- Source/reference path:",
+  "- Accepted base reference path / SHA-256 / approval:",
+  "- Direction references (single pose per direction) / SHA-256 / approval:",
+  "- Reference roles: identity, motion/timing, layout geometry:",
+  "- Asymmetric features / approved mirroring policy:",
   "- Animation tool path:",
   "- Preview manifest path:",
   "- Asset type:",
@@ -274,6 +279,10 @@ Write-TextIfMissing $promptMd @(
   "- Contact anchor is not the visual center.",
   "- Y-axis baseline/source plane must not drift across frames, rows, or variants.",
   "- Keep silhouette, angle, lighting, and scale consistent across related variants.",
+  "- For directional characters, establish the accepted base and one accepted single-pose reference per requested direction before motion generation.",
+  "- Direction references define appearance; motion references define timing; layout guides define geometry. Direction references are not runtime contact anchors.",
+  "- Preserve asymmetric features; do not mirror without explicit approval.",
+  "- Keep one common scale across related frames. Preserve intended airborne heights relative to the fixed source plane.",
   "",
   "Output Report:",
   "- Final image size.",
@@ -320,6 +329,10 @@ Write-TextIfMissing $qaMd @(
   "- Ready for game:",
   "- Canonical asset status: qa/asset-statuses.json",
   "- Promotion rule: generated candidate -> automated QA -> required human reviews -> atomic final promotion.",
+  "- Shared PNG inspector: tools/runner/inspect_sprite.py (report and pending reviews only).",
+  "- Approval binding: contract, candidate, report, declared reference/curation input SHA-256 values.",
+  "- Placement review: contact anchor and source plane verified separately from alpha bbox.",
+  "- Motion review when animated: gait/limb phases, anatomy, loop seam or one-shot start/middle/end. Walk/run stays experimental until approved.",
   "",
   "## Reports",
   "",
@@ -328,7 +341,47 @@ Write-TextIfMissing $qaMd @(
   "| TBD | TBD | TBD | TBD | TBD | qa-needed |"
 )
 
+Write-TextIfMissing $handoffClaudeMd @(
+  "# Handoff — $BatchId",
+  "",
+  "## Completion",
+  "",
+  "- Created at: $createdAt",
+  "- Scope completed: scaffold only; update this report when generation begins.",
+  "- Explicitly not performed: crop, resize, frame assembly, recolor, background removal, QA/gates, final promotion, game-path copy.",
+  "",
+  "## Generation Provenance",
+  "",
+  "- Mode: $GenerationMode",
+  "- Model claim: Codex direct output is unverified and must never be called gpt-image-2.",
+  "- Generated root: output/$BatchId/generated/",
+  "",
+  "## Style References",
+  "",
+  "| Source | Batch copy | Role |",
+  "| --- | --- | --- |",
+  "| TBD | TBD | TBD |",
+  "",
+  "## Generated Attempts",
+  "",
+  "| Asset ID | Attempt count | All attempt paths | Current best attempt | Notes |",
+  "| --- | ---: | --- | --- | --- |",
+  "| TBD | 0 | — | — | not generated |",
+  "",
+  "## Exclusions",
+  "",
+  "- Cancelled / intentionally not generated: none recorded.",
+  "",
+  "## QA And Integration",
+  "",
+  "- QA status: not run",
+  "- Next owner: TBD",
+  "- final/ written: no",
+  "- Game paths copied: no"
+)
+
 Write-Host "Created SpriteMake batch scaffold: $batchRoot"
 Write-Host "Prompt file: $promptMd"
+Write-Host "Generation handoff file: $handoffClaudeMd"
 
 

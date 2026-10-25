@@ -15,9 +15,39 @@ generated candidate
 -> final
 ```
 
-`tools/runner/asset_gate.py`는 candidate 또는 QA report가 승인 뒤 바뀌면
-승격을 거부합니다. Codex 직접 생성의 `unverified` 표기는 QA를 막는 조건이
+`tools/runner/asset_gate.py`는 candidate, QA report, 계약 또는 선언된
+레퍼런스·선택 기록이 승인 뒤 바뀌면 승격을 거부합니다. 비교 이미지와
+스타일 레퍼런스도 승인 당시 SHA-256으로 확인합니다.
+Codex 직접 생성의 `unverified` 표기는 QA를 막는 조건이
 아니며 provenance 기록일 뿐입니다.
+
+### 공용 PNG·모션 검사
+
+Pillow가 설치된 Python 환경에서 배치의 계약과 후보 PNG를 검사합니다.
+
+```text
+python3 tools/runner/inspect_sprite.py --batch-root output/example --contract output/example/contracts/foo.json --image output/example/generated/foo.png --output output/example/qa/foo-report.json --status output/example/qa/foo-status.json
+```
+
+검사기는 정확한 캔버스·격자·셀, 전체/셀별 알파 bbox와 프레임 변화·중복·
+루프 이음새 수치를 기록합니다. 원본 PNG는 보존하고 `qa/`에 결과를 씁니다.
+`--status`를 주면 필요한 리뷰를 `pending`으로 기록합니다. 다시 검사하면
+기존 승인도 초기화됩니다.
+
+알파 bbox만으로 실제 발 접점을 확정하거나, 프레임 차이만으로 올바른
+걸음새를 승인하지 않습니다. 접지·source plane은 placement 리뷰,
+애니메이션은 motion 리뷰에서 실제 재생으로 판정합니다. 후광·스타일·
+해부학 등 검사기가 측정하지 않는 요구는 배치별 QA로 확인해야 합니다.
+기존 더블클릭 `file://` 프리뷰 검수도 수행합니다.
+
+방향별 캐릭터는 승인된 기본 이미지와 방향마다 한 포즈의 레퍼런스를
+먼저 확정합니다. 외형·동작 타이밍·배치 가이드의 역할을 구분하고
+비대칭 장비를 보존합니다. 방향 레퍼런스는 그림이며 contact anchor는
+런타임 좌표입니다.
+
+기존 status에 계약·입력 체크섬이 없으면 다음 승격 전에 QA와 필요한
+리뷰를 다시 기록해야 합니다. 절차와 필드 예시는
+`tools/runner/README.md` 및 배치 스킬의 `references/workflow.md`에 있습니다.
 
 현재 기본 흐름은 키 없는 Codex 직접 생성입니다. Codex 이미지 생성 기능으로 바로 시도하되, 모델을 `gpt-image-2`로 강제하거나 검증하지는 않습니다.
 
@@ -237,6 +267,15 @@ SpriteMake에는 API key를 넣지 않습니다.
 .\.agents\hooks\generation-choice.ps1
 ```
 
+엄격한 `gpt-image-2`를 요청했는데 현재 도구가 그 모델을 선택하거나 검증할 수 없으면 자동으로 거절하거나 대체 생성하지 않습니다. 대신 다음을 한 번 묻습니다.
+
+```text
+현재 도구에서는 gpt-image-2를 고정하거나 검증할 수 없습니다.
+결과를 unverified Codex direct generation으로만 기록하고 generated/에만 보관하는 조건으로 생성할까요?
+```
+
+명시적으로 동의하면 직접 생성하고, 동의하지 않거나 응답이 없으면 strict 외부 프롬프트와 배치 문서만 남깁니다.
+
 짧은 자연어 요청에서 batch까지 자동으로 만들 때는 이 hook을 먼저 씁니다.
 
 ```powershell
@@ -437,4 +476,11 @@ SpriteMake mini-Symphony 돌려서 output batch 상태랑 다음 액션 정리�
 SpriteMake 진행도 GUI 켜줘.
 ```
 
+## 기존 PNG 후처리와 프레임 보정
 
+[오프라인 파이프라인](tools/sprite_pipeline/README.md)으로 색상 변형, 명시적
+chroma 정리, 프레임 rect 추출, sprite-gen manifest 변환, 고정 격자 배치를
+실행할 수 있습니다. 각 시도는 새 후보·계약·manifest·QA·file:// 프리뷰와
+보정 HTML을 만들며 원본과 final 파일은 보존합니다. 보정 화면에서 레시피를
+저장한 뒤 새 attempt로 다시 빌드하세요. 사람의 동작·접지 검토는 별도로
+필요합니다. 시작용은 templates/sprite-process-recipe-template.json입니다.

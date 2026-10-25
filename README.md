@@ -50,6 +50,15 @@ The Runner keeps candidate generation, automated QA, required human review, and
 atomic `final/` promotion separate. It records checksums so a candidate or QA
 report changed after approval cannot be promoted silently.
 
+Shared PNG inspection now lives in
+[tools/runner/inspect_sprite.py](./tools/runner/inspect_sprite.py). It reports
+exact canvas/grid/cell geometry, alpha bboxes and animation frame changes.
+Placement and motion need their own review; metrics alone do not approve a gait.
+The gate also binds the full contract and declared reference/curation inputs
+to their SHA-256 values, so changed inputs require fresh QA and approval.
+Directional character work uses an accepted base and one single-pose reference
+per direction before motion generation. See the updated batch skill workflow.
+
 Related templates:
 
 - [templates/batch-sprite-request-template.md](./templates/batch-sprite-request-template.md)
@@ -109,7 +118,7 @@ SpriteMake가 하지 않는 일:
 - SpriteMake는 이 모델명을 요청서와 프롬프트에 명시합니다.
 - 키 없는 기본 경로는 Codex 직접 생성입니다. 이 경우 모델은 미검증이며, 결과는 `generated/`의 시안으로만 취급합니다.
 - `gpt-image-2` 보장이 필요하면 ChatGPT 웹이나 API key가 있는 외부 생성 화면에서 `PROMPT.md`를 사용해야 합니다.
-- `gpt-image-2`를 사용할 수 없으면 다른 모델로 만든 결과를 조용히 엄격 생성 결과로 취급하지 말고, 조건 미충족 또는 Codex-direct 시안으로 표시합니다.
+- `gpt-image-2`를 현재 도구에서 선택하거나 검증할 수 없으면 다른 모델로 만든 결과를 조용히 엄격 생성 결과로 취급하지 않습니다. 자동 거절도 하지 말고, `unverified Codex direct generation`으로 `generated/`에만 보관하는 조건으로 계속할지 사용자에게 한 번 묻습니다. 동의한 경우에만 직접 생성합니다.
 
 즉, 이 프로젝트의 중심은 `폴더 세팅 + MD 요청서 + manifest + QA + preview tool`입니다.
 
@@ -545,4 +554,11 @@ SpriteMake의 한 줄 목적은 이렇게 쓴다.
 Batch usable sprites: strict atlas + manifest + exact grid + contact anchor + Y-axis baseline + alpha QA + animation preview.
 ```
 
+## Offline sprite processing
 
+Existing PNGs can now be processed locally into color variants and strict atlases
+with fingerprinted QA and standalone frame curation. See
+[tools/sprite_pipeline/README.md](tools/sprite_pipeline/README.md).
+Run the complete geometric human fixture from
+[examples/sprite-pipeline/create_demo.py](examples/sprite-pipeline/create_demo.py),
+then open the generated animation-preview.html or curation.html directly.

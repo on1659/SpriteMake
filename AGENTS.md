@@ -190,6 +190,21 @@ You may print the same text with `.agents/hooks/generation-choice.ps1`.
 
 If the user chooses Codex direct, prepare the batch artifacts, use the prepared prompt with Codex image generation, and keep the result in or referenced from `generated/` for QA. If the user chooses strict `gpt-image-2`, use `PROMPT.md` as the copy-ready prompt and explain that they must paste it into ChatGPT web or another external generation environment. If the user chooses Codex setup-only, stop after the SpriteMake artifacts are ready.
 
+### Strict model unavailable: ask before direct generation
+
+If a user explicitly requires `gpt-image-2` but the current image tool cannot select or verify that model, do not silently substitute it and do not automatically refuse the whole batch. State the limitation, then ask once:
+
+```text
+현재 도구에서는 gpt-image-2를 고정하거나 검증할 수 없습니다.
+결과를 `unverified Codex direct generation`으로만 기록하고 `generated/`에만 보관하는 조건으로 생성할까요?
+```
+
+Proceed with Codex direct generation only after explicit approval. If the user declines or does not answer, prepare only the strict external prompt and batch scaffolding, then stop.
+
+### Required generation-only handoff
+
+When the task's scope is generation-only, write `output/{batch}/HANDOFF-CLAUDE.md` before the final response. The final response must summarize that file and include: completed scope; explicitly excluded work; generation provenance; copied style references; generated root; each asset's attempt count, all attempt paths, and current best attempt; cancelled/excluded assets; QA status and next owner; and whether `final/` or game paths were changed. Never describe unrun QA as passed.
+
 ## Paths And Ownership
 
 Use SpriteMake for:

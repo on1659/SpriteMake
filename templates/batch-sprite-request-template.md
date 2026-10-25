@@ -64,6 +64,11 @@ Asset:
 - Required image model: gpt-image-2
 - Target file path:
 - Source/reference path:
+- Accepted base path / SHA-256 (animated characters):
+- Approved single-pose direction references / directions / SHA-256:
+- Reference role ownership: identity / motion timing / layout geometry:
+- Asymmetric features and explicitly approved mirror derivation, if any:
+- Contract references and qa.requiredInputs:
 - Animation tool path:
 - Preview manifest path:
 - Asset type:
@@ -77,6 +82,9 @@ Asset:
 - Contact anchor:
 - Contact anchor meaning:
 - Y-axis baseline/source plane:
+- Shared scale / allowed airborne displacement:
+- Animation states / frame sequences / FPS / loop intent:
+- Required semantic reviews: content / style / placement / motion:
 - Player-readable purpose:
 - Visual direction override:
 - QA priority:
@@ -87,12 +95,17 @@ Asset:
 ```text
 Batch Rules:
 - Use `gpt-image-2` for image generation/editing requests.
-- Do not silently substitute another image model; stop and report if `gpt-image-2` is unavailable.
+- Do not silently substitute another image model. If `gpt-image-2` is required but cannot be selected or verified, explain this and ask once whether to continue as `unverified Codex direct generation` stored only under `generated/`; stop only if the user declines or does not answer.
 - Keep shared style, camera angle, outline weight, lighting, and in-game scale consistent across every asset.
 - Do not change any target path after generation starts.
 - Do not change grid, row order, column order, or anchor contract per asset unless the batch request is updated.
 - Do not mix source/contact-sheet files with final game-ready atlas files.
 - Keep generated source attempts separate from QA-passed final outputs.
+- For animated characters: accepted base -> approved single-pose reference per actual direction -> matching states. A direction reference is not the runtime contact anchor.
+- Keep identity references, motion timing references and layout geometry guides distinct. Never silently mirror asymmetric features.
+- Repack intermediate rows with one common scale into the fixed final canvas/grid; preserve airborne motion and never fill cells by independent bbox normalization.
+- Record candidate, contract and dependency hashes; regeneration/reference changes invalidate dependent QA and reviews.
+- Use the local inspector for geometry/evidence and separate human placement/motion approval. Walk/run remain experimental until semantic motion passes; bbox, duplicate, diff and seam measurements cannot approve motion.
 - Use project-relative or user-configurable paths in preview tools.
 - Do not hardcode temporary local source paths into docs or reusable templates.
 ```
@@ -112,6 +125,13 @@ output/{batch}/final/
 Final game assets still belong in the target game project after QA passes.
 
 ## Batch QA Summary
+
+Use `tools/runner/inspect_sprite.py --batch-root <batch> --contract <contract>
+--image <candidate> --output <qa-report> [--status <asset-status>]` per asset.
+It writes fingerprints and pending semantic reviews without promotion. Declare
+all dependencies through contract `references` / `qa.requiredInputs` and keep
+their paths within `source/`, `generated/`, `manifests/` or `qa/`. Required halo
+limits need custom/manual QA; the common inspector cannot measure halo.
 
 ```text
 Batch QA Summary:

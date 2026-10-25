@@ -157,7 +157,7 @@ function Get-CanonicalAssetStatusSummary([object[]]$StatusEntries) {
     $qaOutcome = ConvertTo-QaOutcome (Get-NestedObjectPropertyValue $entry @("qa", "status"))
     $reviews = Get-ObjectPropertyValue $entry "reviews"
     $reviewOutcome = "pass"
-    foreach ($reviewName in @("filenameContent", "style")) {
+    foreach ($reviewName in @("filenameContent", "style", "placement", "motion")) {
       $review = Get-ObjectPropertyValue $reviews $reviewName
       if ($null -eq $review) {
         continue
@@ -457,7 +457,7 @@ function New-BatchStatus([System.IO.DirectoryInfo]$BatchDir, [string]$ProjectRoo
   } elseif ($finalPngCount -gt 0 -and $qaStatusSource -eq "asset-status" -and ($qaPendingCount -gt 0 -or $qaEligibleCount -lt $qaStatusCount)) {
     $state = "final-review"
     $priority = 4
-    $nextAction = "Complete the required human reviews and mark promotion.eligible=true in qa/asset-status.json before final approval."
+    $nextAction = "Complete the required human reviews and run asset_gate.py validate to refresh promotion eligibility before final approval."
   } elseif ($finalPngCount -gt 0 -and $hasQaPass) {
     $state = "final-candidate"
     $priority = 4

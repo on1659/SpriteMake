@@ -23,6 +23,49 @@ python3 tools/runner/asset_gate.py promote --batch-root output/example --contrac
 the Mini-Symphony dashboard. A failed validation rewrites only the status's
 promotion block with blockers; it never creates or modifies `final/`.
 
+## Shared PNG and animation inspection
+
+`inspect_sprite.py` requires Pillow in the chosen Python environment. It reads
+the asset contract, checks the PNG's exact canvas/grid/cell geometry and alpha,
+and writes full/per-cell bboxes plus animation duplicate/diff/seam evidence.
+It preserves the source image and writes reports only inside the batch's `qa/`.
+
+```text
+python3 tools/runner/inspect_sprite.py --batch-root output/example --contract output/example/contracts/foo.json --image output/example/generated/foo.png --output output/example/qa/foo-report.json --status output/example/qa/foo-status.json
+```
+
+The optional status output records candidate/report/contract hashes, declared
+reference and curation input hashes, and pending human reviews. Re-running it
+resets reviews; it never grants approval or promotes an image. A measurable QA
+pass is separate from semantic placement and motion approval. Bbox bottoms do
+not establish foot contact; duplicate/diff/seam metrics do not establish gait.
+Halo, anatomy, style and other custom checks need the asset-specific verifier.
+The existing adapted `file://` preview remains part of animation QA.
+
+## Approval inputs
+
+Contracts can declare `references: [{path, role, direction?}]` and
+`qa.requiredInputs: [path]`, for example a curation sidecar or preview manifest.
+These paths are relative to the batch and live in `source/`, `generated/`,
+`manifests/` or `qa/`. The status binds them through
+`qa.inputChecksums: [{path, sha256, role?}]` and binds the full contract bytes
+through `qa.contractSha256`. Changed or missing inputs block promotion even
+when the contract version is unchanged.
+
+When a style review declares a reference or requires a comparison, record
+`reviews.style.referenceSha256` and `reviews.style.comparisonSha256` against
+the images actually reviewed. `reviews.placement.status` must be approved
+when the contract requires placement review or lists `anchor`/`baseline` QA.
+Animated contracts require `reviews.motion.required: true`; approval must
+follow playback at the intended scale and FPS. Inspector-generated statuses
+leave those reviews pending. A fresh review approves the unchanged exported
+candidate, rather than a raw frame cache.
+
+Old statuses without the new contract/input binding must be regenerated and
+reviewed before their next promotion. Existing production files are not
+migrated by these tools. See the updated skill workflow and QA checklist for
+direction references, common scale and airborne-frame handling.
+
 ## Codex App Server capability spike
 
 `codex-app-server.js` is a local stdio-only bridge for the official Codex App
@@ -59,3 +102,9 @@ node tools/runner/request-batch.js "create a rideable fire and ice dragon sprite
 
 The helper reads the current loopback URL from `output/SYMPHONY-GUI.json` and
 posts the request; it does not need the caller to copy a port number.
+
+## Offline PNG processing
+
+For color variants, explicit alpha cleanup, frame extraction, upstream atlas
+import and portable frame curation, use the [offline processing pipeline](../sprite_pipeline/README.md).
+QA inputs also accept batch-local `contracts/` to bind the original authoring contract.

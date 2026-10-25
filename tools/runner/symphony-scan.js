@@ -124,7 +124,7 @@ function summarizeCanonicalStatuses(batchRoot, qaRoot) {
     for (const item of items) {
       const qa = outcome(item.qa?.status);
       let reviews = "pass";
-      for (const name of ["filenameContent", "style"]) {
+      for (const name of ["filenameContent", "style", "placement", "motion"]) {
         const review = item.reviews?.[name];
         if (!isPlainObject(review) || review.required === false) continue;
         const reviewResult = outcome(review.status);
@@ -251,7 +251,7 @@ function scanBatch(outputRoot, batchName) {
     nextAction = "Review the structured QA status before integration; final/ contains PNGs but the current candidate has failed checks.";
   } else if (finalPng > 0 && qaStatusSource === "asset-status" && (qaPending > 0 || qa.eligible < qa.count)) {
     state = "final-review"; priority = 4;
-    nextAction = "Complete the required human reviews and mark promotion.eligible=true in qa/asset-status.json before final approval.";
+    nextAction = "Complete the required human reviews and run asset_gate.py validate to refresh promotion eligibility before final approval.";
   } else if (finalPng > 0 && qaPassed > 0 && qaFailed === 0) {
     state = "final-candidate"; priority = 4;
     nextAction = "Human review: confirm the QA status and copy final assets to the game project only if the target path is correct.";

@@ -78,6 +78,10 @@ Runtime Contract:
 - Game project root:
 - Target asset path:
 - Source/reference path:
+- Accepted base path and SHA-256 (character animation):
+- Approved single-pose direction references, direction and SHA-256:
+- Reference roles: identity / timing-contact phases / layout geometry:
+- Asymmetric identity features and approved mirror policy:
 - Generation provider: OpenAI Images API
 - Required image model: gpt-image-2
 - Asset type:
@@ -91,10 +95,24 @@ Runtime Contract:
 - Contact anchor:
 - Contact anchor meaning:
 - Y-axis baseline or source plane:
+- Shared scale and allowed airborne displacement:
+- Animation states, exact frame sequences, FPS and loop/non-loop intent:
+- Contract references and qa.requiredInputs (batch-relative dependency paths):
 - Alpha/background requirement:
 ```
 
 ## 3. Generation Prompt
+
+For animated characters, accept the base first, then approve one single-pose
+reference per actual direction before generating states. Use the corresponding
+direction reference for identity/facing, a sequence for optional gait timing,
+and layout guides for geometry. Do not silently mirror asymmetric features.
+Record reference hashes; replacing a reference or regenerating its source row
+invalidates dependent QA/reviews even when its filename/frame index is unchanged.
+
+Generated loose rows are intermediate evidence. Repack them into the declared
+fixed atlas using a common scale and recorded offsets. Preserve intentional
+airborne movement; do not normalize every frame to its own bbox or ground line.
 
 Combine the resource brief with the atlas or asset template.
 
@@ -178,6 +196,19 @@ Use normalized anchors only when the manifest explicitly says so:
 ```
 
 ## 5. QA
+
+Run `tools/runner/inspect_sprite.py --batch-root <batch> --contract <contract>
+--image <candidate> --output <qa-report> [--status <asset-status>]` for automatic
+geometry/evidence. It records candidate, contract and dependency fingerprints
+and leaves semantic reviews pending. Declare dependencies in `references` and
+`qa.requiredInputs`, confined to `source/`, `generated/`, `manifests/`, `qa/`.
+
+For animation enable `reviews.motion.required`; approve motion after playback,
+not from duplicates/diffs/seam numbers. Placement review is required for declared
+anchor/baseline checks. Walk/run are experimental until semantic motion passes.
+The common inspector cannot verify `maximumHaloPixels`; use manual/custom QA.
+Changed inputs require new QA and approval. Record `qa.contractSha256`,
+`qa.inputChecksums`, and style comparison/reference hashes when declared.
 
 After generation, verify:
 

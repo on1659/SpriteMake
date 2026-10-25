@@ -8,6 +8,8 @@
 
 현재 기본 운영은 키 없는 Codex 직접 생성이다. Codex 이미지 생성 기능으로 바로 시도할 수 있지만, 이 경로는 `gpt-image-2`를 강제하거나 검증하지 않는다. 엄격한 `gpt-image-2` 보장이 필요하면 `PROMPT.md`를 ChatGPT 웹이나 API key가 있는 외부 생성 환경에 넣는다.
 
+엄격한 `gpt-image-2`를 요청했지만 현재 도구가 모델을 선택하거나 검증할 수 없으면 자동으로 거절하거나 대체 생성하지 않는다. 제한을 알리고, 결과를 `unverified Codex direct generation`으로만 기록해 `generated/`에 보관하는 조건으로 계속할지 한 번 묻는다. 명시적 동의가 있어야만 직접 생성한다.
+
 최종 목표는 예쁜 그림이 아니라 게임 코드가 정확히 자르고 정확히 배치할 수 있는 usable sprite batch다.
 
 ## 핵심 사용 방식
@@ -22,6 +24,7 @@
 8. 생성된 PNG는 바로 게임 프로젝트에 넣지 말고 SpriteMake batch 폴더의 `generated/`에 둔다.
 9. `templates/asset-qa-checklist.md` 기준으로 PNG를 검수한다.
 10. QA 통과 파일만 `final/`에 두고 실제 게임 프로젝트의 `assets/...`로 옮긴다.
+11. 생성 전용 작업을 끝내면 batch의 `HANDOFF-CLAUDE.md`를 작성하고, 최종 응답은 그 내용을 요약한다. 여기에는 완료 범위, 미수행 범위, provenance, 레퍼런스 복사 경로, 에셋별 모든 attempt/횟수/현재 최선 시도, 제외 에셋, QA 상태, 다음 담당자, `final/`·게임 경로 변경 여부를 반드시 넣는다.
 
 ## 중요 규칙
 
@@ -356,6 +359,27 @@ D:\Work\vibe\SpriteMake\sprite-make-mockup.png
 
 ## 다음에 하면 좋은 작업
 
+### 2026-10-04 sprite-gen 비교 후 반영
+
+- 공용 `tools/runner/inspect_sprite.py`: PNG/grid/cell/alpha bbox와 프레임
+  차이·중복·루프 이음새 보고. 원본 보존, `qa/` 출력, 승인은 pending.
+- 승격 gate: 계약 전체와 선언된 reference/curation 입력, 스타일 reference,
+  비교 이미지의 SHA-256을 확인. 접지·모션 리뷰를 분리해 요구한다.
+- batch skill/요청 템플릿: 승인된 기본 이미지→방향별 단일 reference→
+  동작 생성, 비대칭 보존, 공통 배율과 공중 프레임의 높이 보존.
+- intake 및 상태 보드에도 placement/motion 검수 항목을 연결했다.
+- 기하 검사 pass를 실제 걸음새나 발 접점의 승인으로 간주하지 않는다.
+  후광·스타일 등 공용 검사 범위 밖의 요구는 배치별 QA가 필요하다.
+- 이전 status는 다음 승격 전 계약·입력 체크섬과 필요한 리뷰를 다시 기록한다.
+- 기존 batch 후보 및 final PNG는 이번 업데이트의 변경 대상이 아니다.
+- 검증: Python 25개·Node 3개 테스트 통과. 실제 임시 PNG로 검사→승인→
+  승격→reference 변경 차단 및 재검사 시 승인 초기화를 확인했다.
+- 스킬 validator·계약/status JSON 스키마·정적 preflight 통과.
+  이 Mac에는 PowerShell이 없어 `.ps1` 런타임 preflight는 미검증이다.
+
+아래 PNG QA 제작 항목은 공용 검사기가 기본 구조 측정을 제공하므로
+추가 작업에서는 배치별 의미·색 오염 검사를 확장하는 기준으로 사용한다.
+
 1. 프리셋 추가
    - 아이템
    - UI 아이콘
@@ -394,5 +418,27 @@ D:\Work\vibe\SpriteMake\sprite-make-mockup.png
 
 단, 사용자가 짧은 자연어로 “OO 이미지/스프라이트 그려줘”라고 하면 긴 템플릿을 요구하지 말고 `.agents/hooks/sprite-intake.ps1`로 batch와 `PROMPT.md`를 먼저 만든 뒤 Codex 직접 생성으로 진행한다.
 
+## 2026-10-10 — offline sprite-gen processing integration
 
+Implemented tools/sprite_pipeline: pinned upstream recolor helpers with full
+LICENSE/NOTICE/provenance; local explicit chroma/component/rect processing;
+shared-scale fixed-grid packing; upstream absolute-frame manifest adapter;
+portable animation preview and non-destructive frame curation/recipe export.
+Each attempt creates new candidates and derived contracts. Original contract,
+recipe, sources, manifest and transform report are fingerprinted. Processing
+never approves reviews or writes final/game assets. Existing QA foundation is
+included in the integration branch, with contracts/ accepted as a QA input.
 
+Validation: 46 Python unittest cases passed on Python3.12.14/Pillow12.3.0/
+NumPy2.3.5. Real Chromium file:// checks reached ready:true with nonblank canvases,
+working animation selection, no console errors or blocked alpha reads. Browser
+1px recipe edits rebaked to the exact live alpha bbox. Existing Cyrano south-run
+8-frame provisional PNG repacked with identical pixels. These are processing
+checks, not an approval of Cyrano gait, anatomy, style or contact placement.
+PowerShell preflight was not run because PowerShell is not installed here.
+
+Start with tools/sprite_pipeline/README.md and
+examples/sprite-pipeline/create_demo.py. Optional video/RIFE, automatic anatomy
+repair and breathing animation are outside this PNG implementation. Chroma and
+pixelGrid are conservative local tools rather than the complete upstream unmix
+or lattice engines. Attempt statuses do not replace Symphony root status files.
